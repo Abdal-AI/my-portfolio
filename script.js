@@ -52,14 +52,17 @@ const initMain = () => {
         });
         
         // Close menu when a link is clicked
-        navLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                nav.classList.remove('nav-active');
-                burger.classList.remove('toggle');
-                navLinks.forEach((link, index) => {
-                    link.style.animation = '';
-                });
+        const closeMenu = () => {
+            nav.classList.remove('nav-active');
+            burger.classList.remove('toggle');
+            navLinks.forEach((link, index) => {
+                link.style.animation = '';
             });
+        };
+        
+        navLinks.forEach(link => {
+            link.addEventListener('click', closeMenu);
+            link.addEventListener('touchstart', closeMenu); // Add touch support
         });
     }
 };

@@ -244,8 +244,13 @@ nav {
 
 .nav-links li {
     margin: 1.5rem 0;
-    /* Opacity set to 1 to ensure links are visible if JS animation fails or during transition */
     opacity: 1;
+    pointer-events: auto !important; /* Force clicks */
+    z-index: 1002; /* Ensure above everything */
+}
+.nav-links {
+    /* ... previous styles ... */
+    pointer-events: auto !important;
 }
 
 .nav-links a {

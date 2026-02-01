@@ -235,6 +235,7 @@ nav {
     z-index: 1000;
     padding: 0;
     list-style: none;
+    pointer-events: auto; /* Ensure clickable */
 }
 
 .nav-links.nav-active {

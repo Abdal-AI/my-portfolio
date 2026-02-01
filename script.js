@@ -40,8 +40,6 @@ const initMain = () => {
 
             // Animate Links
             navLinks.forEach((link, index) => {
-                // Reset opacity if needed by animation, but default is 1 now.
-                // We re-apply animation to get the fade-in effect.
                 if (link.style.animation) {
                     link.style.animation = '';
                 } else {
@@ -51,6 +49,17 @@ const initMain = () => {
 
             // Burger Animation
             burger.classList.toggle('toggle');
+        });
+        
+        // Close menu when a link is clicked
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                nav.classList.remove('nav-active');
+                burger.classList.remove('toggle');
+                navLinks.forEach((link, index) => {
+                    link.style.animation = '';
+                });
+            });
         });
     }
 };

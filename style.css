@@ -514,20 +514,25 @@ footer {
         display: none;
     }
 
+    nav {
+        display: flex;
+        justify-content: space-between; /* Logo left, nav right */
+        align-items: center;
+    }
+
     .nav-links {
         display: flex;
-        position: absolute;
-        top: auto;
-        right: auto;
+        position: static; /* Remove absolute positioning */
         height: auto;
         background: transparent;
         backdrop-filter: none;
         flex-direction: row;
         width: auto;
-        transform: translate(-50%, 0);
-        left: 50%;
+        transform: none; /* Remove centering transform */
+        left: auto;
         padding: 0;
         gap: 2rem;
+        z-index: auto; /* Reset z-index for desktop */
     }
 
     .nav-links li {

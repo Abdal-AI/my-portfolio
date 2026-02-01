@@ -165,19 +165,11 @@ header {
     position: fixed;
     top: 0;
     width: 100%;
-    z-index: 1000; /* High z-index */
+    z-index: 1000;
     transition: var(--transition);
     background: rgba(15, 23, 42, 0.6);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-/* Ensure clickable elements in header are still clickable */
-header .container {
-    /* pointer-events: auto; Removed as header is now interactive */
 }
 
 header.scrolled {

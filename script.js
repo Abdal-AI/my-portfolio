@@ -51,20 +51,19 @@ const initMain = () => {
             burger.classList.toggle('toggle');
         });
         
-        // Close menu when a link is clicked
-        const closeMenu = () => {
-             // Small delay to visual close to ensure tap registers
-            setTimeout(() => {
-                nav.classList.remove('nav-active');
-                burger.classList.remove('toggle');
-                navLinks.forEach((link, index) => {
-                    link.style.animation = '';
+        // Close menu when a link is clicked - attach to actual <a> tags
+        navLinks.forEach(li => {
+            const link = li.querySelector('a');
+            if (link) {
+                link.addEventListener('click', (e) => {
+                    // Don't prevent default - let the link work
+                    // Close menu after a tiny delay to allow navigation
+                    setTimeout(() => {
+                        nav.classList.remove('nav-active');
+                        burger.classList.remove('toggle');
+                    }, 150);
                 });
-            }, 100);
-        };
-        
-        navLinks.forEach(link => {
-            link.addEventListener('click', closeMenu);
+            }
         });
     }
 };

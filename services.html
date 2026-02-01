@@ -3,12 +3,33 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <style>
-        /* Critical CSS to prevent FOUC */
-        html{font-size:16px;-webkit-text-size-adjust:100%}
-        body{margin:0;padding:0;font-family:system-ui,-apple-system,sans-serif;background:#0f172a;color:#f8fafc;min-height:100vh}
-        *{box-sizing:border-box}
+        /* Critical CSS to prevent zoom issues */
+        html {
+            font-size: 16px !important;
+            -webkit-text-size-adjust: 100% !important;
+            -moz-text-size-adjust: 100% !important;
+            -ms-text-size-adjust: 100% !important;
+            text-size-adjust: 100% !important;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #0f172a;
+            color: #f8fafc;
+            min-height: 100vh;
+            width: 100%;
+            overflow-x: hidden;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        /* Force proper mobile rendering */
+        @media screen and (max-width: 768px) {
+            html { font-size: 16px !important; }
+        }
     </style>
     <title>Services | Dev.Portfolio</title>
     <link rel="icon" href="new_logo.png" type="image/png">

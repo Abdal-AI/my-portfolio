@@ -119,7 +119,8 @@ img {
     transition: var(--transition);
     text-align: center;
     position: relative;
-    z-index: 20; /* Ensure clickable above other elements */
+    z-index: 9999; /* Extremely high z-index to force clickability */
+    pointer-events: auto !important; /* Force pointer events */
 }
 
 /* Ensure glass card content is above interactions */

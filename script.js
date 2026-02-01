@@ -53,11 +53,14 @@ const initMain = () => {
         
         // Close menu when a link is clicked
         const closeMenu = () => {
-            nav.classList.remove('nav-active');
-            burger.classList.remove('toggle');
-            navLinks.forEach((link, index) => {
-                link.style.animation = '';
-            });
+             // Small delay to visual close to ensure tap registers
+            setTimeout(() => {
+                nav.classList.remove('nav-active');
+                burger.classList.remove('toggle');
+                navLinks.forEach((link, index) => {
+                    link.style.animation = '';
+                });
+            }, 100);
         };
         
         navLinks.forEach(link => {

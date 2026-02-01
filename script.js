@@ -153,3 +153,74 @@ if (document.readyState === 'loading') {
 } else {
     initChatBot();
 }
+
+// Contact Form Logic (AJAX)
+const initContactForm = () => {
+    const form = document.querySelector('.contact-form');
+    if (!form) return;
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const btn = form.querySelector('button[type="submit"]');
+        const originalText = btn.textContent;
+        
+        // Show loading state
+        btn.textContent = 'Sending...';
+        btn.disabled = true;
+        btn.style.opacity = '0.7';
+
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                // Success - Replace form with success message
+                form.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; animation: navLinkFade 0.5s ease forwards;">
+                        <i class="fas fa-check-circle" style="font-size: 4rem; color: #1dbf73; margin-bottom: 1rem;"></i>
+                        <h3 style="margin-bottom: 1rem;">Message Sent!</h3>
+                        <p style="color: var(--text-secondary);">Thanks for reaching out. I'll get back to you shortly.</p>
+                        <button onclick="location.reload()" class="btn btn-primary" style="margin-top: 1.5rem; border: none;">Send Another</button>
+                    </div>
+                `;
+            } else {
+                // Error from server
+                return response.json().then(data => {
+                    if (Object.hasOwn(data, 'errors')) {
+                        alert(data["errors"].map(error => error["message"]).join(", "));
+                    } else {
+                        alert("Oops! There was a problem submitting your form. Please try again.");
+                    }
+                }).catch(() => {
+                     alert("Oops! There was a problem submitting your form. Please try again.");
+                });
+            }
+        })
+        .catch(error => {
+            alert("Oops! There was a problem connecting to the server. Please check your internet connection.");
+            console.error(error);
+        })
+        .finally(() => {
+            // Restore button if form still exists (it won't on success, but will on error)
+            if (form.contains(btn)) {
+                btn.textContent = originalText;
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            }
+        });
+    });
+};
+
+// Initialize Contact Form
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initContactForm);
+} else {
+    initContactForm();
+}

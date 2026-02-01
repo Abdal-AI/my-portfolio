@@ -62,7 +62,6 @@ const initMain = () => {
         
         navLinks.forEach(link => {
             link.addEventListener('click', closeMenu);
-            link.addEventListener('touchstart', closeMenu); // Add touch support
         });
     }
 };

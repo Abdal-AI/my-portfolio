@@ -55,13 +55,10 @@ const initMain = () => {
         navLinks.forEach(li => {
             const link = li.querySelector('a');
             if (link) {
-                link.addEventListener('click', (e) => {
-                    // Don't prevent default - let the link work
-                    // Close menu after a tiny delay to allow navigation
-                    setTimeout(() => {
-                        nav.classList.remove('nav-active');
-                        burger.classList.remove('toggle');
-                    }, 150);
+                link.addEventListener('click', () => {
+                    // Close menu immediately - navigation still works
+                    nav.classList.remove('nav-active');
+                    burger.classList.remove('toggle');
                 });
             }
         });

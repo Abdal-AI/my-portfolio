@@ -164,11 +164,17 @@ header {
     position: fixed;
     top: 0;
     width: 100%;
-    z-index: 100;
+    z-index: 1000; /* High z-index */
     transition: var(--transition);
     background: rgba(15, 23, 42, 0.6);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    pointer-events: none; /* Let clicks pass through empty spaces in header */
+}
+
+/* Ensure clickable elements in header are still clickable */
+header .container {
+    pointer-events: auto;
 }
 
 header.scrolled {
@@ -184,6 +190,7 @@ nav {
     justify-content: space-between;
     align-items: center;
     position: relative;
+    z-index: 1001; /* Ensure nav is above header background */
 }
 
 .logo-img {

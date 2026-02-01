@@ -55,11 +55,33 @@ const initMain = () => {
         navLinks.forEach(li => {
             const link = li.querySelector('a');
             if (link) {
-                link.addEventListener('click', () => {
-                    // Close menu immediately - navigation still works
+                // Regular click event
+                link.addEventListener('click', (e) => {
+                    const href = link.getAttribute('href');
+                    
+                    // Close menu immediately
                     nav.classList.remove('nav-active');
                     burger.classList.remove('toggle');
+                    
+                    // Force navigation on mobile if default doesn't work
+                    if (href && !e.defaultPrevented) {
+                        // Small delay to let menu close animation start
+                        setTimeout(() => {
+                            window.location.href = href;
+                        }, 50);
+                    }
                 });
+                
+                // Add touchend as backup for mobile
+                link.addEventListener('touchend', (e) => {
+                    const href = link.getAttribute('href');
+                    if (href) {
+                        e.preventDefault(); // Prevent double-firing
+                        nav.classList.remove('nav-active');
+                        burger.classList.remove('toggle');
+                        window.location.href = href;
+                    }
+                }, { passive: false });
             }
         });
     }

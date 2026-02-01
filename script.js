@@ -1,4 +1,5 @@
-document.addEventListener('DOMContentLoaded', () => {
+// Initialize Main Logic
+const initMain = () => {
     // Dynamic Year
     const yearSpan = document.getElementById('year');
     if (yearSpan) {
@@ -7,13 +8,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Header Scroll Effect
     const header = document.querySelector('header');
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 50) {
-            header.classList.add('scrolled');
-        } else {
-            header.classList.remove('scrolled');
-        }
-    });
+    if (header) {
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+    }
 
     // Mobile Nav Toggle
     const styles = `
@@ -37,6 +40,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Animate Links
             navLinks.forEach((link, index) => {
+                // Reset opacity if needed by animation, but default is 1 now.
+                // We re-apply animation to get the fade-in effect.
                 if (link.style.animation) {
                     link.style.animation = '';
                 } else {
@@ -48,7 +53,13 @@ document.addEventListener('DOMContentLoaded', () => {
             burger.classList.toggle('toggle');
         });
     }
-});
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMain);
+} else {
+    initMain();
+}
 
 // Chatbot Logic
 const initChatBot = () => {

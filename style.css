@@ -218,8 +218,8 @@ nav {
 
 .nav-links li {
     margin: 1.5rem 0;
-    opacity: 0;
-    /* Animated independently */
+    /* Opacity set to 1 to ensure links are visible if JS animation fails or during transition */
+    opacity: 1;
 }
 
 .nav-links a {

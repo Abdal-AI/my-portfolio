@@ -196,10 +196,14 @@ const initContactForm = () => {
                     if (Object.hasOwn(data, 'errors')) {
                         alert(data["errors"].map(error => error["message"]).join(", "));
                     } else {
-                        alert("Oops! There was a problem submitting your form. Please try again.");
+                        alert("Server Error: " + (data.message || "Unknown error"));
                     }
                 }).catch(() => {
-                     alert("Oops! There was a problem submitting your form. Please try again.");
+                    // processing as text if json fails
+                    return response.text().then(text => {
+                        console.error("Server Error Response:", text);
+                         alert("Server Error (" + response.status + "): " + response.statusText + "\n\nPlease check the console or try again later.");
+                    });
                 });
             }
         })

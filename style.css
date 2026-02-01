@@ -118,6 +118,23 @@ img {
     border: 1px solid transparent;
     transition: var(--transition);
     text-align: center;
+    position: relative;
+    z-index: 20; /* Ensure clickable above other elements */
+}
+
+/* Ensure glass card content is above interactions */
+.glass-card {
+    position: relative;
+    z-index: 5;
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    border-radius: var(--card-radius);
+    padding: 1.5rem;
+    /* Smaller padding for mobile */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: var(--transition);
 }
 
 .btn-primary {

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio | Web Dev & AI Specialist</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <header>
+        <div class="container">
+            <nav>
+                <a href="index.html" class="logo">
+                    <img src="new_logo.png" alt="Logo" class="logo-img">
+                </a>
+                <ul class="nav-links">
+                    <li><a href="index.html" class="active">Home</a></li>
+                    <li><a href="services.html">Services</a></li>
+                    <li><a href="portfolio.html">Portfolio</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+                <div class="burger">
+                    <div class="line1"></div>
+                    <div class="line2"></div>
+                    <div class="line3"></div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero section-padding"
+        style="padding-top: 10rem; min-height: 90vh; display: flex; align-items: center;">
+        <div class="container">
+            <div class="hero-content">
+                <div>
+                    <p class="hero-subtitle">HELLO, I'M ABDAL KHAN</p>
+                    <h1 class="hero-title">I bridge the gap between <span
+                            style="background: linear-gradient(to right, #38bdf8, #818cf8); -webkit-background-clip: text; background-clip: text; color: transparent;">Web
+                            Development</span>, AI, and Automation.</h1>
+                    <p style="font-size: 1.1rem; max-width: 600px; margin-bottom: 2.5rem;">
+                        Creating intelligent web solutions that drive real business results. Expert in WordPress,
+                        Python/AI, and Workflow Automation.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="portfolio.html" class="btn btn-primary">View My Work</a>
+                        <a href="https://drive.google.com/file/d/1JpySWDQHjUjmjaiJyUiT8-OLuBSxRyZj/view?usp=drive_link"
+                            target="_blank" class="btn btn-outline"><i class="fas fa-download"
+                                style="margin-right: 8px;"></i>Download CV</a>
+                        <a href="contact.html" class="btn btn-outline">Let's Connect</a>
+                    </div>
+                </div>
+                <!-- Profile Image -->
+                <div>
+                    <img src="profile.png" alt="Abdal Khan" class="hero-img">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Stats Bar -->
+    <section class="stats" style="margin-bottom: 4rem;">
+        <div class="container">
+            <div class="glass-card grid-3" style="align-items: center; text-align: center;">
+                <div class="stat-item">
+                    <a href="https://www.kaggle.com/muhammadabdal123" target="_blank" style="text-decoration: none;">
+                        <h3 style="color: var(--accent); margin-bottom: 0.5rem;">Top 1%</h3>
+                        <p style="margin-bottom: 0;">Kaggle Ranking</p>
+                    </a>
+                </div>
+                <div class="stat-item">
+                    <h3 style="color: var(--accent); margin-bottom: 0.5rem;">500+</h3>
+                    <p style="margin-bottom: 0;">GitHub Contributions</p>
+                </div>
+                <div class="stat-item">
+                    <h3 style="color: var(--accent); margin-bottom: 0.5rem;">5.0 <i class="fas fa-star"
+                            style="font-size: 1rem;"></i></h3>
+                    <p style="margin-bottom: 0;">Fiverr Rating</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Core Expertise -->
+    <section class="expertise section-padding">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 3rem;">Core Expertise</h2>
+            <div class="grid-3">
+                <div class="glass-card">
+                    <img src="web_solutions.png" alt="WordPress Dev" class="service-img">
+                    <h3>WordPress Dev</h3>
+                    <p>Custom theme development, Elementor Pro mastery, and high-performance e-commerce solutions
+                        tailored for growth.</p>
+                </div>
+                <div class="glass-card">
+                    <img src="data_strategy.png" alt="Python & AI" class="service-img">
+                    <h3>Python & AI</h3>
+                    <p>Building intelligent systems with Python. Face recognition, data analysis, and integrating LLMs
+                        into web apps.</p>
+                </div>
+                <div class="glass-card">
+                    <img src="automation.png" alt="n8n Automation" class="service-img">
+                    <h3>n8n Automation</h3>
+                    <p>Connecting your favorite apps to create seamless, automated workflows that save time and reduce
+                        manual error.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Featured Projects -->
+    <section class="projects section-padding" style="background: rgba(255, 255, 255, 0.02);">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 3rem;">Featured Projects</h2>
+            <div class="grid-3">
+                <!-- Project 1: Web Dev -->
+                <div class="glass-card">
+                    <img src="portfolio_luxe.png" alt="Luxe Cosmetics" class="project-img">
+                    <div style="margin-bottom: 1rem;">
+                        <span class="project-tag">Web Dev</span>
+                        <span class="project-tag">WordPress</span>
+                    </div>
+                    <h3>Luxe Cosmetics E-commerce</h3>
+                    <p>A premium e-commerce experience built with Elementor Pro. Features custom product filters,
+                        dynamic carts, and 95+ PageSpeed score.</p>
+                    <a href="portfolio.html" class="btn btn-outline"
+                        style="padding: 0.5rem 1.5rem; font-size: 0.9rem;">View
+                        Project</a>
+                </div>
+
+                <!-- Project 2: AI -->
+                <div class="glass-card">
+                    <img src="portfolio_face_rec.png" alt="Face Recognition" class="project-img">
+                    <div style="margin-bottom: 1rem;">
+                        <span class="project-tag">AI & Python</span>
+                        <span class="project-tag">OpenCV</span>
+                    </div>
+                    <h3>Face Recognition System</h3>
+                    <p>Real-time face detection and recognition system using Python and OpenCV. Capable of identifying
+                        employees for automated attendance.</p>
+                    <a href="https://github.com/Abdal-AI/Face-Recognition-Attendance-System" class="btn btn-outline"
+                        style="padding: 0.5rem 1.5rem; font-size: 0.9rem;">View Code</a>
+                </div>
+
+                <!-- Project 3: Automation -->
+                <div class="glass-card">
+                    <img src="portfolio_crm.png" alt="CRM Sync" class="project-img">
+                    <div style="margin-bottom: 1rem;">
+                        <span class="project-tag">Automation</span>
+                        <span class="project-tag">n8n</span>
+                    </div>
+                    <h3>CRM Sync Workflow</h3>
+                    <p>Automated workflow connecting HubSpot to Slack. Notifies the sales team instantly when high-value
+                        leads are captured.</p>
+                    <a href="portfolio.html" class="btn btn-outline"
+                        style="padding: 0.5rem 1.5rem; font-size: 0.9rem;">View Flow</a>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 3rem;">
+                <a href="portfolio.html" class="btn btn-primary">View All Projects</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <img src="new_logo.png" alt="Abdal Khan Logo" class="logo-img" style="height: 50px;">
+                    <p>Bridging the gap between Web Development, AI, and Automation to build the future of digital
+                        solutions.</p>
+                </div>
+
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="services.html">Services</a></li>
+                        <li><a href="portfolio.html">Portfolio</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-social">
+                    <h4>Connect</h4>
+                    <div class="footer-social-icons">
+                        <a href="https://github.com/Abdal-AI"><i class="fab fa-github"></i></a>
+                        <a href="https://www.linkedin.com/in/muhammad-abdal-619451299/" target="_blank"><i
+                                class="fab fa-linkedin"></i></a>
+                        <a href="https://x.com/abdalkhan1514" target="_blank"><i class="fab fa-twitter"></i></a>
+                        <a href="https://www.kaggle.com/muhammadabdal123" target="_blank"><i
+                                class="fab fa-kaggle"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; <span id="year"></span> Abdal Khan. All rights reserved.</p>
+        </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

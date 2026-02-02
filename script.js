@@ -93,8 +93,34 @@ if (document.readyState === 'loading') {
     initMain();
 }
 
-// Chatbot Logic
+// Chatbot Logic with Gemini API Integration
 const initChatBot = () => {
+    // ⚠️ IMPORTANT: Replace with your actual Gemini API key
+    // Get your free key at: https://aistudio.google.com/app/apikey
+    const GEMINI_API_KEY = 'YOUR_GEMINI_API_KEY_HERE';
+    const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+    
+    // Conversation history for context
+    let conversationHistory = [];
+    
+    // System context about Abdal
+    const systemContext = `You are an AI assistant for Muhammad Abdal's professional portfolio website. 
+    
+About Muhammad Abdal:
+- Expert in Web Development (WordPress, custom sites)
+- Specializes in AI Automation using n8n
+- Data Scientist with expertise in Python, ML, and analysis
+- Contact: muhammadabdal15140@gmail.com
+- Services offered: 
+  * Web Development (Portfolio sites starting at $60, Business sites at $150, E-commerce at $400)
+  * AI Automation workflows with n8n
+  * Data Analysis and Machine Learning projects
+- Notable projects: Library Management System, Titanic Survival Prediction, E-commerce platforms
+- Social: GitHub (Abdal-AI), LinkedIn, Kaggle
+
+Be helpful, professional, and concise. If asked about services or pricing, provide accurate information. 
+If asked to contact him, direct users to the contact form or email. Keep responses friendly and under 3 sentences when possible.`;
+
     // Inject HTML
     const chatHTML = `
     <div class="chat-widget">
@@ -102,13 +128,13 @@ const initChatBot = () => {
             <div class="chat-header">
                 <div>
                     <h3>AI Assistant</h3>
-                    <p style="font-size: 0.75rem; color: var(--accent); margin: 0;">Online</p>
+                    <p style="font-size: 0.75rem; color: var(--accent); margin: 0;" id="chatStatus">Powered by Gemini</p>
                 </div>
                 <button class="chat-close" id="closeChat"><i class="fas fa-times"></i></button>
             </div>
             <div class="chat-messages" id="chatMessages">
                 <div class="message bot">
-                    Hello! I'm Abdal's AI Assistant. How can I help you today?
+                    👋 Hello! I'm Abdal's AI Assistant powered by Google Gemini. I can answer questions about his services, projects, and expertise. How can I help you today?
                 </div>
             </div>
             <div class="chat-input-area">
@@ -126,53 +152,157 @@ const initChatBot = () => {
     // Elements
     const toggleBtn = document.getElementById('toggleChat');
     const closeBtn = document.getElementById('closeChat');
-    const window = document.getElementById('chatWindow');
+    const chatWindow = document.getElementById('chatWindow');
     const input = document.getElementById('chatInput');
     const sendBtn = document.getElementById('sendMessage');
     const messages = document.getElementById('chatMessages');
+    const statusText = document.getElementById('chatStatus');
 
     // Toggle Chat
-    const toggleChat = () => window.classList.toggle('active');
+    const toggleChat = () => chatWindow.classList.toggle('active');
     toggleBtn.addEventListener('click', toggleChat);
     closeBtn.addEventListener('click', toggleChat);
 
+    // Add typing indicator
+    const showTypingIndicator = () => {
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'message bot typing-indicator';
+        typingDiv.id = 'typingIndicator';
+        typingDiv.innerHTML = '<span></span><span></span><span></span>';
+        messages.appendChild(typingDiv);
+        messages.scrollTop = messages.scrollHeight;
+    };
+
+    const hideTypingIndicator = () => {
+        const indicator = document.getElementById('typingIndicator');
+        if (indicator) indicator.remove();
+    };
+
+    // Add Message to UI
+    const addMessage = (text, sender) => {
+        const div = document.createElement('div');
+        div.className = `message ${sender}`;
+        
+        // Support markdown-like formatting
+        let formattedText = text
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/\n/g, '<br>');
+        
+        div.innerHTML = formattedText;
+        messages.appendChild(div);
+        messages.scrollTop = messages.scrollHeight;
+    };
+
+    // Get AI Response from Gemini
+    const getGeminiResponse = async (userMessage) => {
+        try {
+            // Add user message to history
+            conversationHistory.push({
+                role: 'user',
+                parts: [{ text: userMessage }]
+            });
+
+            // Prepare the request
+            const requestBody = {
+                contents: [
+                    {
+                        role: 'user',
+                        parts: [{ text: systemContext }]
+                    },
+                    ...conversationHistory
+                ],
+                generationConfig: {
+                    temperature: 0.7,
+                    topK: 40,
+                    topP: 0.95,
+                    maxOutputTokens: 200,
+                }
+            };
+
+            const response = await fetch(GEMINI_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.status}`);
+            }
+
+            const data = await response.json();
+            
+            if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+                const aiResponse = data.candidates[0].content.parts[0].text;
+                
+                // Add AI response to history
+                conversationHistory.push({
+                    role: 'model',
+                    parts: [{ text: aiResponse }]
+                });
+
+                // Keep history manageable (last 10 exchanges)
+                if (conversationHistory.length > 20) {
+                    conversationHistory = conversationHistory.slice(-20);
+                }
+
+                return aiResponse;
+            } else {
+                throw new Error('Invalid response format');
+            }
+
+        } catch (error) {
+            console.error('Gemini API Error:', error);
+            
+            // Fallback to basic responses if API fails
+            if (GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY_HERE') {
+                return "⚠️ Please configure your Gemini API key to enable AI responses. Get your free API key at https://aistudio.google.com/app/apikey";
+            }
+            
+            return "I'm having trouble connecting right now. Please try again or use the Contact form to reach Abdal directly at muhammadabdal15140@gmail.com";
+        }
+    };
+
     // Send Message Logic
-    const sendMessage = () => {
+    const sendMessage = async () => {
         const text = input.value.trim();
         if (!text) return;
+
+        // Disable input while processing
+        input.disabled = true;
+        sendBtn.disabled = true;
 
         // Add User Message
         addMessage(text, 'user');
         input.value = '';
 
-        // Simulate AI Thinking
-        setTimeout(() => {
-            const response = getBotResponse(text);
-            addMessage(response, 'bot');
-        }, 1000);
-    };
+        // Show typing indicator
+        showTypingIndicator();
+        statusText.textContent = 'Thinking...';
 
-    const addMessage = (text, sender) => {
-        const div = document.createElement('div');
-        div.className = `message ${sender}`;
-        div.textContent = text;
-        messages.appendChild(div);
-        messages.scrollTop = messages.scrollHeight;
-    };
-
-    const getBotResponse = (text) => {
-        const lower = text.toLowerCase();
-        if (lower.includes('price') || lower.includes('cost')) return "My pricing starts at $60 for a portfolio site. Check the Services page for full packages!";
-        if (lower.includes('contact') || lower.includes('email') || lower.includes('hire')) return "You can reach me at muhammadabdal15140@gmail.com or use the Contact form.";
-        if (lower.includes('service') || lower.includes('do')) return "I offer Web Development, AI Automation, and Data Analysis. What do you need?";
-        if (lower.includes('hello') || lower.includes('hi')) return "Hi there! Ready to build something amazing?";
-        return "Thanks for your message! I'm a demo agent, but Abdal will get back to you personally if you use the Contact page.";
+        // Get AI Response
+        const response = await getGeminiResponse(text);
+        
+        // Hide typing indicator and add response
+        hideTypingIndicator();
+        addMessage(response, 'bot');
+        
+        // Re-enable input
+        input.disabled = false;
+        sendBtn.disabled = false;
+        statusText.textContent = 'Powered by Gemini';
+        input.focus();
     };
 
     // Event Listeners
     sendBtn.addEventListener('click', sendMessage);
     input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') sendMessage();
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
     });
 };
 

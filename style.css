@@ -306,27 +306,31 @@ nav {
 }
 
 /* ==========================================
-   HERO SECTION (Mobile First)
+   HERO SECTION (Mobile First - Image on TOP)
    ========================================== */
 .hero-content {
     display: flex;
-    flex-direction: column-reverse;
+    flex-direction: column;
     align-items: center;
-    gap: 2rem;
+    gap: 2.5rem;
     text-align: center;
 }
 
-.hero-content > div:nth-child(2) {
-    margin-bottom: 1rem;
+.hero-content > div:first-child {
+    order: 2;
+}
+
+.hero-content > div:last-child {
+    order: 1;
 }
 
 .hero-img {
-    width: min(220px, 60vw);
-    height: min(220px, 60vw);
+    width: 280px;
+    height: 280px;
     object-fit: cover;
-    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-    border: 2px solid #00d2ff;
-    box-shadow: 0 0 40px rgba(0, 210, 255, 0.6), inset 0 0 20px rgba(0, 210, 255, 0.4);
+    border-radius: 50%;
+    border: 4px solid #00d2ff;
+    box-shadow: 0 0 50px rgba(0, 210, 255, 0.7), 0 0 100px rgba(0, 210, 255, 0.3), inset 0 0 30px rgba(0, 210, 255, 0.4);
     animation: morph 8s ease-in-out infinite;
     position: relative;
     z-index: 10;
@@ -343,8 +347,8 @@ nav {
     color: var(--accent);
     font-weight: 700;
     margin-bottom: 1rem;
-    font-size: clamp(0.75rem, 2.5vw, 1.2rem);
-    letter-spacing: 2px;
+    font-size: 1rem;
+    letter-spacing: 3px;
     text-transform: uppercase;
     animation: fadeInUp 1s ease-out;
 }
@@ -355,9 +359,10 @@ nav {
 
 .hero-buttons {
     display: flex;
-    gap: 0.75rem;
+    gap: 1rem;
     justify-content: center;
     flex-wrap: wrap;
+    margin-top: 1rem;
 }
 
 @keyframes fadeInUp {
@@ -800,7 +805,7 @@ footer {
         gap: 2rem;
     }
     
-    /* Hero Layout */
+    /* Hero Layout - Side by Side on Tablet */
     .hero-content {
         display: grid;
         grid-template-columns: 1.2fr 0.8fr;
@@ -809,8 +814,12 @@ footer {
         gap: 2.5rem;
     }
     
-    .hero-content > div:nth-child(2) {
-        margin-bottom: 0;
+    .hero-content > div:first-child {
+        order: 1;
+    }
+    
+    .hero-content > div:last-child {
+        order: 2;
     }
     
     .hero-img {
@@ -1038,14 +1047,17 @@ footer {
     
     /* Larger hero subtitle */
     .hero-subtitle {
-        font-size: 0.95rem !important;
-        letter-spacing: 2.5px;
+        font-size: 1.1rem !important;
+        letter-spacing: 3px;
+        margin-top: 1rem;
     }
     
-    /* Bigger hero image */
+    /* MUCH Bigger hero image - like the reference */
     .hero-img {
-        width: 260px !important;
-        height: 260px !important;
+        width: 300px !important;
+        height: 300px !important;
+        border-width: 4px;
+        box-shadow: 0 0 60px rgba(0, 210, 255, 0.8), 0 0 120px rgba(0, 210, 255, 0.4);
     }
     
     /* Larger glass cards */

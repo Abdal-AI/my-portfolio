@@ -98,7 +98,7 @@ const initChatBot = () => {
     // ⚠️ IMPORTANT: Replace with your actual Gemini API key
     // Get your free key at: https://aistudio.google.com/app/apikey
     const GEMINI_API_KEY = 'AIzaSyBwFbdKLE4U8Hw7BAnSELTMyk5b6saqJ5Q';
-    const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+    const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
     
     // Conversation history for context
     let conversationHistory = [];

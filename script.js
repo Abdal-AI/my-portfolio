@@ -256,12 +256,19 @@ If asked to contact him, direct users to the contact form or email. Keep respons
         } catch (error) {
             console.error('Gemini API Error:', error);
             
-            // Fallback to basic responses if API fails
-            if (GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY_HERE') {
-                return "⚠️ Please configure your Gemini API key to enable AI responses. Get your free API key at https://aistudio.google.com/app/apikey";
+            // Show detailed error in chat for easier debugging
+            let errorMessage = "I'm having trouble connecting right now.";
+            if (error.message.includes("403")) {
+                errorMessage = "⚠️ Error 403: Forbidden. API key might be invalid or has restrictions.";
+            } else if (error.message.includes("429")) {
+                errorMessage = "⚠️ Error 429: Too many requests. Please wait a minute.";
+            } else if (error.message.includes("404")) {
+                errorMessage = "⚠️ Error 404: Model not found. The configured model might not be available.";
+            } else if (error.message) {
+                errorMessage = `⚠️ Connection Error: ${error.message}`;
             }
             
-            return "I'm having trouble connecting right now. Please try again or use the Contact form to reach Abdal directly at muhammadabdal15140@gmail.com";
+            return errorMessage + " <br><br>Please contact muhammadabdal15140@gmail.com if this persists.";
         }
     };
 

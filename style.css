@@ -80,6 +80,9 @@ a {
     text-decoration: none;
     color: inherit;
     transition: var(--transition);
+    position: relative;
+    z-index: 100;
+    pointer-events: auto !important;
 }
 
 img {
@@ -252,6 +255,19 @@ nav {
     margin: 4px 0;
     transition: all 0.3s ease;
     border-radius: 2px;
+}
+
+/* Burger Animation */
+.toggle .line1 {
+    transform: rotate(-45deg) translate(-5px, 6px);
+}
+
+.toggle .line2 {
+    opacity: 0;
+}
+
+.toggle .line3 {
+    transform: rotate(45deg) translate(-5px, -6px);
 }
 
 /* Mobile Nav Links - COMPLETELY hidden when closed to prevent click blocking */
@@ -555,7 +571,7 @@ footer {
     position: fixed;
     bottom: 1rem;
     right: 1rem;
-    z-index: 999;
+    z-index: 9999;
     display: flex;
     flex-direction: column;
     align-items: flex-end;

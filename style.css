@@ -204,15 +204,14 @@ header {
     position: fixed;
     top: 0;
     width: 100%;
-    z-index: 1000;
+    z-index: 20000;
     transition: var(--transition);
-    background: rgba(15, 23, 42, 0.85);
+    background: rgba(15, 23, 42, 0.95);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    pointer-events: none; /* Let clicks pass through to content below */
 }
 
 header .container {
-    pointer-events: auto; /* Re-enable clicks for actual header content */
+    /* No special pointer-events needed here if header is top-aligned */
 }
 
 header.scrolled {
@@ -243,7 +242,7 @@ nav {
     display: flex;
     flex-direction: column;
     cursor: pointer;
-    z-index: 10001; /* Must be higher than nav-links */
+    z-index: 21000;
     padding: 10px;
     margin: -10px;
 }
@@ -272,29 +271,28 @@ nav {
 
 /* Mobile Nav Links - COMPLETELY hidden when closed to prevent click blocking */
 .nav-links {
-    display: none;
+    display: flex;
     position: fixed;
     right: 0;
     height: 100vh;
     height: 100dvh;
     top: 0;
-    background-color: var(--bg-darker); /* Fully opaque background */
+    background-color: #020617; /* Solid Dark Color */
     flex-direction: column;
     align-items: center;
     justify-content: center;
     width: 100%;
-    z-index: 10000; /* Higher than buttons (5000) */
+    transform: translateX(100%);
+    transition: transform 0.4s cubic-bezier(0.77, 0, 0.175, 1);
+    z-index: 20500;
     padding: 0;
     list-style: none;
-    opacity: 0;
-    transition: opacity 0.3s ease;
     pointer-events: none;
     visibility: hidden;
 }
 
 .nav-links.nav-active {
-    display: flex;
-    opacity: 1;
+    transform: translateX(0%);
     pointer-events: auto;
     visibility: visible;
 }
@@ -307,23 +305,22 @@ nav {
 }
 
 .nav-links a {
-    font-weight: 500;
-    color: var(--text-secondary);
-    font-size: 1.25rem;
+    font-weight: 700;
+    color: #ffffff !important;
+    font-size: 1.5rem;
     position: relative;
-    padding: 1rem 2rem;
+    padding: 1.5rem 2rem;
     display: block;
     width: 100%;
-    transition: color 0.3s ease, background 0.3s ease;
+    transition: all 0.3s ease;
     cursor: pointer;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: rgba(56, 189, 248, 0.3);
-    user-select: none;
+    text-align: center;
+    z-index: 20600;
 }
 
 .nav-links a:hover,
 .nav-links a.active {
-    color: var(--text-primary);
+    color: var(--accent) !important;
     background: rgba(56, 189, 248, 0.1);
 }
 

@@ -34,9 +34,11 @@ const initMain = () => {
     const navLinks = document.querySelectorAll('.nav-links li');
 
     if (burger) {
-        burger.addEventListener('click', () => {
+        burger.addEventListener('click', (e) => {
+            e.stopPropagation();
             // Toggle Nav
             nav.classList.toggle('nav-active');
+            burger.classList.toggle('toggle');
 
             // Animate Links
             navLinks.forEach((link, index) => {
@@ -46,42 +48,24 @@ const initMain = () => {
                     link.style.animation = `navLinkFade 0.5s ease forwards ${index / 7 + 0.3}s`;
                 }
             });
-
-            // Burger Animation
-            burger.classList.toggle('toggle');
         });
-        
-        // Close menu when a link is clicked - attach to actual <a> tags
+
+        // Close menu when clicking outside or on a link
+        document.addEventListener('click', (e) => {
+            if (nav.classList.contains('nav-active') && !nav.contains(e.target) && !burger.contains(e.target)) {
+                nav.classList.remove('nav-active');
+                burger.classList.remove('toggle');
+            }
+        });
+
+        // Close menu when a link is clicked
         navLinks.forEach(li => {
             const link = li.querySelector('a');
             if (link) {
-                // Regular click event
-                link.addEventListener('click', (e) => {
-                    const href = link.getAttribute('href');
-                    
-                    // Close menu immediately
+                link.addEventListener('click', () => {
                     nav.classList.remove('nav-active');
                     burger.classList.remove('toggle');
-                    
-                    // Force navigation on mobile if default doesn't work
-                    if (href && !e.defaultPrevented) {
-                        // Small delay to let menu close animation start
-                        setTimeout(() => {
-                            window.location.href = href;
-                        }, 50);
-                    }
                 });
-                
-                // Add touchend as backup for mobile
-                link.addEventListener('touchend', (e) => {
-                    const href = link.getAttribute('href');
-                    if (href) {
-                        e.preventDefault(); // Prevent double-firing
-                        nav.classList.remove('nav-active');
-                        burger.classList.remove('toggle');
-                        window.location.href = href;
-                    }
-                }, { passive: false });
             }
         });
     }

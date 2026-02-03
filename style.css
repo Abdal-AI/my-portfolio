@@ -930,11 +930,13 @@ footer {
         backdrop-filter: none;
         flex-direction: row;
         width: auto;
-        transform: none;
+        transform: none !important;
         padding: 0;
         gap: 2rem;
         z-index: auto;
         pointer-events: auto;
+        visibility: visible;
+        opacity: 1;
     }
     
     .nav-links li {

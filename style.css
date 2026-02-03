@@ -81,8 +81,14 @@ a {
     color: inherit;
     transition: var(--transition);
     position: relative;
-    z-index: 100;
+    z-index: 5000; /* Higher priority */
     pointer-events: auto !important;
+    display: inline-block;
+}
+
+button {
+    pointer-events: auto !important;
+    cursor: pointer;
 }
 
 img {
@@ -92,13 +98,28 @@ img {
 }
 
 /* ==========================================
-   UTILITY CLASSES
+   UTILITY CLASSES & CLICK FIX
    ========================================== */
 .container {
     width: 100%;
     max-width: 1280px;
     margin: 0 auto;
     padding: 0 1.25rem;
+    pointer-events: none; /* Let clicks pass through containers */
+}
+
+.container > * {
+    pointer-events: auto; /* Re-enable for direct children */
+}
+
+section {
+    position: relative;
+    pointer-events: none; /* Let clicks pass through sections */
+}
+
+/* Ensure glass cards don't block content */
+.glass-card {
+    pointer-events: auto !important;
 }
 
 .section-padding {
@@ -204,10 +225,11 @@ header {
     position: fixed;
     top: 0;
     width: 100%;
-    z-index: 20000;
+    z-index: 25000; /* Absolute Top */
     transition: var(--transition);
-    background: rgba(15, 23, 42, 0.95);
+    background: rgba(15, 23, 42, 0.98);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    pointer-events: auto !important;
 }
 
 /* Header spacing fixed */
@@ -275,14 +297,14 @@ nav {
     height: 100vh;
     height: 100dvh;
     top: 0;
-    background-color: #020617; /* Solid Dark Color */
+    background-color: #020617;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     width: 100%;
     transform: translateX(100%);
     transition: transform 0.4s cubic-bezier(0.77, 0, 0.175, 1);
-    z-index: 20500;
+    z-index: 26000; /* Higher than header */
     padding: 0;
     list-style: none;
     pointer-events: none;
@@ -291,21 +313,22 @@ nav {
 
 .nav-links.nav-active {
     transform: translateX(0%);
-    pointer-events: auto;
+    pointer-events: auto !important;
     visibility: visible;
 }
 
 .nav-links li {
-    margin: 1rem 0;
+    margin: 1.5rem 0;
     opacity: 1;
     width: 100%;
     text-align: center;
+    pointer-events: auto !important;
 }
 
 .nav-links a {
     font-weight: 700;
     color: #ffffff !important;
-    font-size: 1.5rem;
+    font-size: 1.8rem; /* Even larger for touch */
     position: relative;
     padding: 1.5rem 2rem;
     display: block;
@@ -313,7 +336,8 @@ nav {
     transition: all 0.3s ease;
     cursor: pointer;
     text-align: center;
-    z-index: 20600;
+    z-index: 27000;
+    pointer-events: auto !important;
 }
 
 .nav-links a:hover,

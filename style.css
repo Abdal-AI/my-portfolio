@@ -115,12 +115,10 @@ img {
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     transition: var(--transition);
     position: relative;
-    z-index: 5;
 }
 
 .glass-card:hover {
     background: rgba(255, 255, 255, 0.08);
-    transform: translateY(-5px);
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
     border-color: rgba(255, 255, 255, 0.2);
 }
@@ -252,7 +250,7 @@ nav {
     border-radius: 2px;
 }
 
-/* Mobile Nav Links */
+/* Mobile Nav Links - Hidden by default, doesn't block clicks */
 .nav-links {
     display: flex;
     position: fixed;
@@ -268,23 +266,23 @@ nav {
     justify-content: center;
     width: 100%;
     transform: translateX(100%);
-    transition: transform 0.4s ease-in-out;
+    transition: transform 0.4s ease-in-out, visibility 0.4s;
     z-index: 2000;
     padding: 0;
     list-style: none;
     pointer-events: none;
+    visibility: hidden;
 }
 
 .nav-links.nav-active {
     transform: translateX(0%);
     pointer-events: auto;
+    visibility: visible;
 }
 
 .nav-links li {
     margin: 1rem 0;
     opacity: 1;
-    pointer-events: auto;
-    z-index: 2001;
     width: 100%;
     text-align: center;
 }
@@ -302,8 +300,6 @@ nav {
     touch-action: manipulation;
     -webkit-tap-highlight-color: rgba(56, 189, 248, 0.3);
     user-select: none;
-    pointer-events: auto;
-    z-index: 2002;
 }
 
 .nav-links a:hover,
@@ -352,8 +348,6 @@ nav {
     border: 4px solid #00d2ff;
     box-shadow: 0 0 50px rgba(0, 210, 255, 0.7), 0 0 100px rgba(0, 210, 255, 0.3), inset 0 0 30px rgba(0, 210, 255, 0.4);
     animation: morph 8s ease-in-out infinite;
-    position: relative;
-    z-index: 10;
     transition: transform 0.3s ease;
 }
 

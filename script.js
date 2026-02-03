@@ -93,33 +93,125 @@ if (document.readyState === 'loading') {
     initMain();
 }
 
-// Chatbot Logic with Gemini API Integration
+// Simple Chatbot (No API Required)
 const initChatBot = () => {
-    // ⚠️ IMPORTANT: Replace with your actual Gemini API key
-    // Get your free key at: https://aistudio.google.com/app/apikey
-    const GEMINI_API_KEY = 'AIzaSyBwFbdKLE4U8Hw7BAnSELTMyk5b6saqJ5Q';
-    const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
-    
-    // Conversation history for context
-    let conversationHistory = [];
-    
-    // System context about Abdal
-    const systemContext = `You are an AI assistant for Muhammad Abdal's professional portfolio website. 
-    
-About Muhammad Abdal:
-- Expert in Web Development (WordPress, custom sites)
-- Specializes in AI Automation using n8n
-- Data Scientist with expertise in Python, ML, and analysis
-- Contact: muhammadabdal15140@gmail.com
-- Services offered: 
-  * Web Development (Portfolio sites starting at $60, Business sites at $150, E-commerce at $400)
-  * AI Automation workflows with n8n
-  * Data Analysis and Machine Learning projects
-- Notable projects: Library Management System, Titanic Survival Prediction, E-commerce platforms
-- Social: GitHub (Abdal-AI), LinkedIn, Kaggle
+    // Knowledge base about Abdal
+    const knowledge = {
+        name: "Muhammad Abdal",
+        email: "muhammadabdal15140@gmail.com",
+        whatsapp: "+923419007352",
+        fiverr: "https://www.fiverr.com/abdalkhan1514",
+        github: "https://github.com/Abdal-AI",
+        linkedin: "https://www.linkedin.com/in/muhammad-abdal-619451299/",
+        kaggle: "https://www.kaggle.com/muhammadabdal123",
+        services: {
+            portfolio: { name: "Portfolio Website", price: "$60", features: "5-Page Responsive Site, Contact Form, Social Links, Basic SEO" },
+            business: { name: "Business Website", price: "$100", features: "Up to 10 Pages, Booking System, Live Chat, Google Analytics" },
+            ecommerce: { name: "E-commerce Store", price: "$200", features: "WooCommerce Setup, 50 Products, Payment Gateway, Discounts" },
+            data: { name: "Data Cleaning & Analysis", price: "$80", features: "Python/Pandas, Data Formatting, Exploratory Analysis" },
+            automation: { name: "n8n Workflow Automation", price: "$120", features: "1 Complex Workflow, API Integrations, Error Handling" },
+            dashboard: { name: "Interactive Dashboard", price: "$150", features: "Power BI or Streamlit, 5 Visualizations, Interactive Filters" }
+        },
+        skills: ["WordPress", "Python", "n8n Automation", "Data Science", "Machine Learning", "Power BI", "WooCommerce", "Elementor Pro"],
+        projects: ["Luxe Cosmetics E-commerce", "Face Recognition System", "Sales Dashboard", "CRM Sync Workflow", "Titanic Survival Prediction"]
+    };
 
-Be helpful, professional, and concise. If asked about services or pricing, provide accurate information. 
-If asked to contact him, direct users to the contact form or email. Keep responses friendly and under 3 sentences when possible.`;
+    // Response patterns
+    const getResponse = (input) => {
+        const msg = input.toLowerCase().trim();
+        
+        // Greetings
+        if (/^(hi|hello|hey|hola|greetings|good morning|good afternoon|good evening)/.test(msg)) {
+            return `👋 Hello! I'm Abdal's assistant. I can help you with:\n\n• **Services & Pricing**\n• **Contact Information**\n• **Projects & Portfolio**\n• **Skills & Expertise**\n\nWhat would you like to know?`;
+        }
+        
+        // Pricing / Services
+        if (/price|pricing|cost|how much|rate|charge|package|service/i.test(msg)) {
+            if (/portfolio/i.test(msg)) {
+                return `📁 **Portfolio Website - ${knowledge.services.portfolio.price}**\n\nIncludes: ${knowledge.services.portfolio.features}\n\nPerfect for freelancers and creatives!\n\n👉 [Order Now](contact.html)`;
+            }
+            if (/business/i.test(msg)) {
+                return `🏢 **Business Website - ${knowledge.services.business.price}**\n\nIncludes: ${knowledge.services.business.features}\n\nIdeal for growing businesses!\n\n👉 [Order Now](contact.html)`;
+            }
+            if (/ecommerce|e-commerce|shop|store/i.test(msg)) {
+                return `🛒 **E-commerce Store - ${knowledge.services.ecommerce.price}**\n\nIncludes: ${knowledge.services.ecommerce.features}\n\nStart selling online today!\n\n👉 [Order Now](contact.html)`;
+            }
+            if (/data|cleaning|analysis/i.test(msg)) {
+                return `📊 **Data Cleaning & Analysis - ${knowledge.services.data.price}**\n\nIncludes: ${knowledge.services.data.features}\n\nTurn raw data into insights!\n\n👉 [Order Now](contact.html)`;
+            }
+            if (/automation|n8n|workflow/i.test(msg)) {
+                return `⚙️ **n8n Workflow Automation - ${knowledge.services.automation.price}**\n\nIncludes: ${knowledge.services.automation.features}\n\nAutomate your busy work!\n\n👉 [Order Now](contact.html)`;
+            }
+            if (/dashboard|power bi|visualization/i.test(msg)) {
+                return `📈 **Interactive Dashboard - ${knowledge.services.dashboard.price}**\n\nIncludes: ${knowledge.services.dashboard.features}\n\nVisualize your metrics!\n\n👉 [Order Now](contact.html)`;
+            }
+            // General pricing
+            return `💰 **Service Pricing:**\n\n• Portfolio Website: **$60**\n• Business Website: **$100**\n• E-commerce Store: **$200**\n• Data Cleaning: **$80**\n• n8n Automation: **$120**\n• Dashboard: **$150**\n\nAsk about any specific service for details!`;
+        }
+        
+        // Contact
+        if (/contact|email|reach|hire|message|whatsapp|phone|call/i.test(msg)) {
+            return `📬 **Contact Abdal:**\n\n📧 Email: ${knowledge.email}\n📱 WhatsApp: ${knowledge.whatsapp}\n💼 Fiverr: [Order a Gig](${knowledge.fiverr})\n\nOr use the [Contact Form](contact.html) to send a message directly!`;
+        }
+        
+        // Skills
+        if (/skill|expertise|technology|tech|stack|know|experience|specialize/i.test(msg)) {
+            return `🛠️ **Abdal's Skills:**\n\n${knowledge.skills.map(s => `• ${s}`).join('\n')}\n\nSpecializing in Web Development, AI/ML, and Business Automation!`;
+        }
+        
+        // Projects / Portfolio
+        if (/project|portfolio|work|done|example|case study/i.test(msg)) {
+            return `🎯 **Featured Projects:**\n\n${knowledge.projects.map(p => `• ${p}`).join('\n')}\n\nView all projects: [Portfolio](portfolio.html)`;
+        }
+        
+        // About
+        if (/about|who|tell me|introduce|yourself/i.test(msg)) {
+            return `👨‍💻 **About ${knowledge.name}:**\n\nI'm a Web Developer, Data Scientist, and Automation Expert. I help businesses build stunning websites, analyze data for insights, and automate repetitive tasks.\n\n🏆 Top 1% on Kaggle\n⭐ 5.0 Rating on Fiverr\n💻 500+ GitHub Contributions`;
+        }
+        
+        // WordPress
+        if (/wordpress|wp|theme|elementor/i.test(msg)) {
+            return `🌐 **WordPress Development:**\n\nI build custom WordPress sites using Elementor Pro with:\n• Custom themes & designs\n• WooCommerce integration\n• Speed optimization (95+ PageSpeed)\n• SEO-friendly structure\n\nStarting at **$60** for portfolio sites!`;
+        }
+        
+        // AI / Python
+        if (/ai|python|machine learning|ml|data science|artificial intelligence/i.test(msg)) {
+            return `🤖 **AI & Data Science:**\n\nI work with Python for:\n• Machine Learning models\n• Data analysis & visualization\n• Face recognition systems\n• Predictive analytics\n• Automation scripts\n\nCheck my [Kaggle Profile](${knowledge.kaggle})!`;
+        }
+        
+        // Automation
+        if (/automat|n8n|workflow|integrate|api/i.test(msg)) {
+            return `⚙️ **Workflow Automation:**\n\nUsing n8n, I can automate:\n• Email notifications\n• CRM integrations (HubSpot, Salesforce)\n• Social media posting\n• Data syncing between apps\n• Custom API workflows\n\nStarting at **$120**!`;
+        }
+        
+        // Social links
+        if (/github|linkedin|twitter|kaggle|social/i.test(msg)) {
+            return `🔗 **Social Links:**\n\n• GitHub: [Abdal-AI](${knowledge.github})\n• LinkedIn: [Muhammad Abdal](${knowledge.linkedin})\n• Kaggle: [Profile](${knowledge.kaggle})\n• Twitter: [@abdalkhan1514](https://x.com/abdalkhan1514)`;
+        }
+        
+        // Thanks
+        if (/thank|thanks|thx|appreciate/i.test(msg)) {
+            return `😊 You're welcome! Is there anything else I can help you with? Feel free to ask about services, pricing, or how to get in touch!`;
+        }
+        
+        // Goodbye
+        if (/bye|goodbye|see you|later|exit|quit/i.test(msg)) {
+            return `👋 Goodbye! Thanks for visiting. Feel free to come back anytime or [contact Abdal](contact.html) directly!`;
+        }
+        
+        // Fiverr
+        if (/fiverr|gig|order|freelanc/i.test(msg)) {
+            return `💼 **Order on Fiverr:**\n\nYou can hire me directly on Fiverr with secure payments and guaranteed delivery!\n\n👉 [Visit My Fiverr Profile](${knowledge.fiverr})\n\n⭐ 5.0 Rating • Fast Delivery • 24/7 Support`;
+        }
+        
+        // Help
+        if (/help|what can you|how does|how do/i.test(msg)) {
+            return `🤖 **I can help you with:**\n\n• "What services do you offer?"\n• "How much does a website cost?"\n• "How can I contact you?"\n• "Tell me about your projects"\n• "What are your skills?"\n\nJust ask me anything!`;
+        }
+        
+        // Default response
+        return `🤔 I'm not sure I understand. Try asking about:\n\n• **Services** - "What services do you offer?"\n• **Pricing** - "How much does a website cost?"\n• **Contact** - "How can I reach you?"\n• **Projects** - "Show me your work"\n\nOr visit the [Contact Page](contact.html) to message Abdal directly!`;
+    };
 
     // Inject HTML
     const chatHTML = `
@@ -127,23 +219,23 @@ If asked to contact him, direct users to the contact form or email. Keep respons
         <div class="chat-window" id="chatWindow">
             <div class="chat-header">
                 <div>
-                    <h3>AI Assistant</h3>
-                    <p style="font-size: 0.75rem; color: var(--accent); margin: 0;" id="chatStatus">Powered by Gemini</p>
+                    <h3>Assistant</h3>
+                    <p style="font-size: 0.75rem; color: var(--accent); margin: 0;" id="chatStatus">Online</p>
                 </div>
                 <button class="chat-close" id="closeChat"><i class="fas fa-times"></i></button>
             </div>
             <div class="chat-messages" id="chatMessages">
                 <div class="message bot">
-                    👋 Hello! I'm Abdal's AI Assistant powered by Google Gemini. I can answer questions about his services, projects, and expertise. How can I help you today?
+                    👋 Hi! I'm Abdal's assistant. Ask me about services, pricing, or how to get in touch!
                 </div>
             </div>
             <div class="chat-input-area">
-                <input type="text" class="chat-input" id="chatInput" placeholder="Type a message...">
+                <input type="text" class="chat-input" id="chatInput" placeholder="Ask about services, pricing...">
                 <button class="chat-send" id="sendMessage"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
         <button class="chat-toggle" id="toggleChat">
-            <i class="fas fa-robot"></i>
+            <i class="fas fa-comments"></i>
         </button>
     </div>
     `;
@@ -156,37 +248,20 @@ If asked to contact him, direct users to the contact form or email. Keep respons
     const input = document.getElementById('chatInput');
     const sendBtn = document.getElementById('sendMessage');
     const messages = document.getElementById('chatMessages');
-    const statusText = document.getElementById('chatStatus');
 
     // Toggle Chat
     const toggleChat = () => chatWindow.classList.toggle('active');
     toggleBtn.addEventListener('click', toggleChat);
     closeBtn.addEventListener('click', toggleChat);
 
-    // Add typing indicator
-    const showTypingIndicator = () => {
-        const typingDiv = document.createElement('div');
-        typingDiv.className = 'message bot typing-indicator';
-        typingDiv.id = 'typingIndicator';
-        typingDiv.innerHTML = '<span></span><span></span><span></span>';
-        messages.appendChild(typingDiv);
-        messages.scrollTop = messages.scrollHeight;
-    };
-
-    const hideTypingIndicator = () => {
-        const indicator = document.getElementById('typingIndicator');
-        if (indicator) indicator.remove();
-    };
-
     // Add Message to UI
     const addMessage = (text, sender) => {
         const div = document.createElement('div');
         div.className = `message ${sender}`;
         
-        // Support markdown-like formatting
         let formattedText = text
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" style="color: var(--accent);">$1</a>')
             .replace(/\n/g, '<br>');
         
         div.innerHTML = formattedText;
@@ -194,113 +269,19 @@ If asked to contact him, direct users to the contact form or email. Keep respons
         messages.scrollTop = messages.scrollHeight;
     };
 
-    // Get AI Response from Gemini
-    const getGeminiResponse = async (userMessage) => {
-        try {
-            // Add user message to history
-            conversationHistory.push({
-                role: 'user',
-                parts: [{ text: userMessage }]
-            });
-
-            // Prepare the request
-            const requestBody = {
-                contents: [
-                    {
-                        role: 'user',
-                        parts: [{ text: systemContext }]
-                    },
-                    ...conversationHistory
-                ],
-                generationConfig: {
-                    temperature: 0.7,
-                    topK: 40,
-                    topP: 0.95,
-                    maxOutputTokens: 200,
-                }
-            };
-
-            const response = await fetch(GEMINI_API_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(requestBody)
-            });
-
-            if (!response.ok) {
-                throw new Error(`API Error: ${response.status}`);
-            }
-
-            const data = await response.json();
-            
-            if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
-                const aiResponse = data.candidates[0].content.parts[0].text;
-                
-                // Add AI response to history
-                conversationHistory.push({
-                    role: 'model',
-                    parts: [{ text: aiResponse }]
-                });
-
-                // Keep history manageable (last 10 exchanges)
-                if (conversationHistory.length > 20) {
-                    conversationHistory = conversationHistory.slice(-20);
-                }
-
-                return aiResponse;
-            } else {
-                throw new Error('Invalid response format');
-            }
-
-        } catch (error) {
-            console.error('Gemini API Error:', error);
-            
-            // Show detailed error in chat for easier debugging
-            let errorMessage = "I'm having trouble connecting right now.";
-            if (error.message.includes("403")) {
-                errorMessage = "⚠️ Error 403: Forbidden. API key might be invalid or has restrictions.";
-            } else if (error.message.includes("429")) {
-                errorMessage = "⚠️ Error 429: Too many requests. Please wait a minute.";
-            } else if (error.message.includes("404")) {
-                errorMessage = "⚠️ Error 404: Model not found. The configured model might not be available.";
-            } else if (error.message) {
-                errorMessage = `⚠️ Connection Error: ${error.message}`;
-            }
-            
-            return errorMessage + " <br><br>Please contact muhammadabdal15140@gmail.com if this persists.";
-        }
-    };
-
     // Send Message Logic
-    const sendMessage = async () => {
+    const sendMessage = () => {
         const text = input.value.trim();
         if (!text) return;
 
-        // Disable input while processing
-        input.disabled = true;
-        sendBtn.disabled = true;
-
-        // Add User Message
         addMessage(text, 'user');
         input.value = '';
 
-        // Show typing indicator
-        showTypingIndicator();
-        statusText.textContent = 'Thinking...';
-
-        // Get AI Response
-        const response = await getGeminiResponse(text);
-        
-        // Hide typing indicator and add response
-        hideTypingIndicator();
-        addMessage(response, 'bot');
-        
-        // Re-enable input
-        input.disabled = false;
-        sendBtn.disabled = false;
-        statusText.textContent = 'Powered by Gemini';
-        input.focus();
+        // Simulate brief "typing" delay
+        setTimeout(() => {
+            const response = getResponse(text);
+            addMessage(response, 'bot');
+        }, 300);
     };
 
     // Event Listeners

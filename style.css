@@ -210,9 +210,7 @@ header {
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-header .container {
-    /* No special pointer-events needed here if header is top-aligned */
-}
+/* Header spacing fixed */
 
 header.scrolled {
     background: rgba(15, 23, 42, 0.9);
@@ -946,10 +944,17 @@ footer {
     }
     
     .nav-links a {
-        font-size: 1rem;
+        font-size: 1rem !important;
         padding: 0.5rem 0;
         display: inline;
         width: auto;
+        background: transparent !important;
+        color: var(--text-secondary) !important;
+    }
+    
+    .nav-links a:hover,
+    .nav-links a.active {
+        color: var(--accent) !important;
         background: transparent !important;
     }
     

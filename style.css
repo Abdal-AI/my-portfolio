@@ -243,7 +243,7 @@ nav {
     display: flex;
     flex-direction: column;
     cursor: pointer;
-    z-index: 2010;
+    z-index: 10001; /* Must be higher than nav-links */
     padding: 10px;
     margin: -10px;
 }
@@ -272,18 +272,18 @@ nav {
 
 /* Mobile Nav Links - COMPLETELY hidden when closed to prevent click blocking */
 .nav-links {
-    display: none; /* Truly gone when closed */
+    display: none;
     position: fixed;
     right: 0;
     height: 100vh;
     height: 100dvh;
     top: 0;
-    background-color: rgba(2, 6, 23, 0.99);
+    background-color: var(--bg-darker); /* Fully opaque background */
     flex-direction: column;
     align-items: center;
     justify-content: center;
     width: 100%;
-    z-index: 2000;
+    z-index: 10000; /* Higher than buttons (5000) */
     padding: 0;
     list-style: none;
     opacity: 0;

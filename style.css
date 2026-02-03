@@ -979,47 +979,203 @@ footer {
 }
 
 /* ==========================================
-   EXTRA SMALL SCREENS (max 480px)
+   MOBILE SCREENS (max 767px) - LARGER SIZES
    ========================================== */
-@media (max-width: 480px) {
+@media (max-width: 767px) {
+    /* Larger base text */
+    html {
+        font-size: 20px !important;
+    }
+    
+    body {
+        font-size: 1.15rem;
+        line-height: 1.8;
+    }
+    
+    /* Larger headings */
+    h1 {
+        font-size: 2.2rem !important;
+        line-height: 1.25;
+    }
+    
+    h2 {
+        font-size: 1.8rem !important;
+    }
+    
+    h3 {
+        font-size: 1.4rem !important;
+    }
+    
+    h4 {
+        font-size: 1.2rem !important;
+    }
+    
+    p {
+        font-size: 1.1rem;
+        line-height: 1.8;
+    }
+    
+    /* Larger container padding */
     .container {
-        padding: 0 0.75rem;
+        padding: 0 1.25rem;
+    }
+    
+    .section-padding {
+        padding: 3.5rem 0;
+    }
+    
+    /* Bigger buttons */
+    .btn {
+        padding: 1rem 2rem;
+        font-size: 1.05rem;
+        min-height: 54px;
     }
     
     .hero-buttons .btn {
-        padding: 0.75rem 1.25rem;
-        font-size: 0.85rem;
-        width: 100%;
+        padding: 1rem 1.75rem;
+        font-size: 1rem;
     }
     
+    /* Larger hero subtitle */
+    .hero-subtitle {
+        font-size: 0.95rem !important;
+        letter-spacing: 2.5px;
+    }
+    
+    /* Bigger hero image */
+    .hero-img {
+        width: 260px !important;
+        height: 260px !important;
+    }
+    
+    /* Larger glass cards */
     .glass-card {
-        padding: 1rem;
+        padding: 1.5rem;
     }
     
+    /* Bigger service images */
+    .service-img {
+        max-width: 140px;
+    }
+    
+    /* Larger project images */
     .project-img {
-        height: 160px;
+        height: 200px;
     }
     
+    /* Bigger project tags */
+    .project-tag {
+        font-size: 0.85rem;
+        padding: 0.35rem 0.9rem;
+    }
+    
+    /* Larger pricing */
+    .price-tag {
+        font-size: 2.5rem;
+    }
+    
+    /* Bigger nav links in mobile menu */
+    .nav-links a {
+        font-size: 1.5rem !important;
+        padding: 1.25rem 2rem;
+    }
+    
+    /* Larger burger menu */
+    .burger div {
+        width: 30px;
+        height: 4px;
+        margin: 5px 0;
+    }
+    
+    /* MUCH BIGGER Chat toggle button */
     .chat-widget {
-        bottom: 0.75rem;
-        right: 0.75rem;
+        bottom: 1.25rem;
+        right: 1.25rem;
     }
     
     .chat-toggle {
-        width: 50px;
-        height: 50px;
-        font-size: 1.2rem;
+        width: 70px !important;
+        height: 70px !important;
+        font-size: 1.75rem !important;
+        box-shadow: 0 0 30px var(--accent-glow);
     }
     
     .chat-window {
-        width: calc(100vw - 1.5rem);
-        height: 70vh;
-        max-height: 450px;
+        width: calc(100vw - 2rem);
+        height: 75vh;
+        max-height: 550px;
     }
     
-    /* Contact form 1 column on small screens */
-    .contact-form .form-row {
-        grid-template-columns: 1fr !important;
+    .chat-header h3 {
+        font-size: 1.2rem;
+    }
+    
+    .chat-input {
+        font-size: 1rem;
+        padding: 1rem 1.25rem;
+    }
+    
+    .chat-send {
+        width: 50px;
+        height: 50px;
+        font-size: 1.1rem;
+    }
+    
+    .message {
+        font-size: 1rem;
+        padding: 0.9rem 1.1rem;
+    }
+    
+    /* Footer */
+    .footer-social-icons a {
+        width: 50px;
+        height: 50px;
+        font-size: 1.3rem;
+    }
+    
+    .footer-bottom {
+        font-size: 0.95rem;
+    }
+    
+    /* Stats */
+    .stat-item h3 {
+        font-size: 1.6rem !important;
+    }
+    
+    .stat-item p {
+        font-size: 1rem;
+    }
+}
+
+/* ==========================================
+   EXTRA SMALL SCREENS (max 400px)
+   ========================================== */
+@media (max-width: 400px) {
+    html {
+        font-size: 18px !important;
+    }
+    
+    .container {
+        padding: 0 1rem;
+    }
+    
+    h1 {
+        font-size: 1.9rem !important;
+    }
+    
+    .hero-img {
+        width: 220px !important;
+        height: 220px !important;
+    }
+    
+    .hero-buttons .btn {
+        width: 100%;
+    }
+    
+    .chat-toggle {
+        width: 64px !important;
+        height: 64px !important;
+        font-size: 1.5rem !important;
     }
 }
 

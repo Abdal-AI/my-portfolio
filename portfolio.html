@@ -166,6 +166,70 @@
         </div>
     </section>
 
+    <!-- Reviews Section -->
+    <section class="reviews-section section-padding" style="background: rgba(255, 255, 255, 0.02);">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 1rem;">Client Reviews</h2>
+            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 3rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+                See what clients are saying about working with me. Your feedback helps me improve!
+            </p>
+
+            <!-- Review Form -->
+            <div class="glass-card" style="max-width: 700px; margin: 0 auto 4rem auto;">
+                <h3 style="margin-bottom: 1.5rem; text-align: center;">
+                    <i class="fas fa-star" style="color: var(--accent); margin-right: 0.5rem;"></i>
+                    Leave a Review
+                </h3>
+                <form id="reviewForm" class="review-form">
+                    <div class="form-group">
+                        <label for="reviewerName">Your Name *</label>
+                        <input type="text" id="reviewerName" name="reviewerName" required placeholder="John Doe">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="reviewerRole">Your Role/Company (Optional)</label>
+                        <input type="text" id="reviewerRole" name="reviewerRole" placeholder="CEO at Company">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Rating *</label>
+                        <div class="star-rating" id="starRating">
+                            <i class="fas fa-star" data-rating="1"></i>
+                            <i class="fas fa-star" data-rating="2"></i>
+                            <i class="fas fa-star" data-rating="3"></i>
+                            <i class="fas fa-star" data-rating="4"></i>
+                            <i class="fas fa-star" data-rating="5"></i>
+                        </div>
+                        <input type="hidden" id="rating" name="rating" value="5" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reviewText">Your Review *</label>
+                        <textarea id="reviewText" name="reviewText" rows="4" required 
+                            placeholder="Share your experience working with me..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                        <i class="fas fa-paper-plane" style="margin-right: 0.5rem;"></i>
+                        Submit Review
+                    </button>
+                </form>
+            </div>
+
+            <!-- Reviews Display -->
+            <div id="reviewsDisplay">
+                <h3 style="text-align: center; margin-bottom: 2rem;">What Clients Say</h3>
+                <div class="reviews-grid" id="reviewsGrid">
+                    <!-- Reviews will be dynamically inserted here -->
+                    <div class="glass-card review-card" style="text-align: center; padding: 3rem 2rem;">
+                        <i class="fas fa-comments" style="font-size: 3rem; color: var(--accent); margin-bottom: 1rem; opacity: 0.5;"></i>
+                        <p style="color: var(--text-secondary);">No reviews yet. Be the first to leave a review!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <footer>
         <div class="container">
             <div class="footer-content">

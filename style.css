@@ -1367,3 +1367,195 @@ select:focus-visible,
         height: 450px;
     }
 }
+
+/* ==========================================
+   REVIEW SYSTEM STYLES
+   ========================================== */
+
+/* Review Form Styling */
+.review-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.review-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.review-form input[type="text"],
+.review-form textarea {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    color: var(--text-primary);
+    font-family: var(--font-main);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.review-form input[type="text"]:focus,
+.review-form textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+}
+
+.review-form textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+/* Star Rating System */
+.star-rating {
+    display: flex;
+    gap: 0.5rem;
+    font-size: 1.75rem;
+    margin-top: 0.5rem;
+    cursor: pointer;
+}
+
+.star-rating i {
+    color: #334155;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.star-rating i:hover,
+.star-rating i.active {
+    color: var(--accent);
+    transform: scale(1.1);
+}
+
+.star-rating i:hover ~ i {
+    color: #334155;
+}
+
+/* Reviews Grid */
+.reviews-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+@media (min-width: 768px) {
+    .reviews-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .reviews-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Individual Review Card */
+.review-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 200px;
+}
+
+.review-header {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    align-items: flex-start;
+}
+
+.review-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: white;
+    font-size: 1rem;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.review-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.review-info h4 {
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+    word-wrap: break-word;
+}
+
+.review-info p {
+    margin-bottom: 0.25rem;
+    font-size: 0.85rem;
+}
+
+.review-stars {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.review-text {
+    flex: 1;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+}
+
+.review-date {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    margin: 0;
+    opacity: 0.7;
+}
+
+/* Empty State */
+.review-card:only-child {
+    grid-column: 1 / -1;
+}
+
+/* Animation for new reviews */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.review-card {
+    animation: slideInUp 0.4s ease-out;
+}
+
+/* Hover effect for review cards */
+.review-card:hover {
+    transform: translateY(-4px);
+}
+
+/* Success Message Animation */
+@keyframes successPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.fa-check-circle {
+    animation: successPulse 0.6s ease-in-out;
+}

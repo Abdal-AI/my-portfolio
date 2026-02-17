@@ -362,3 +362,189 @@ if (document.readyState === 'loading') {
 } else {
     initContactForm();
 }
+
+// ============================
+// REVIEW SYSTEM
+// ============================
+
+const initReviewSystem = () => {
+    const reviewForm = document.getElementById('reviewForm');
+    if (!reviewForm) return; // Only run on pages with review form
+
+    const starRating = document.getElementById('starRating');
+    const ratingInput = document.getElementById('rating');
+    const reviewsGrid = document.getElementById('reviewsGrid');
+
+    // Star Rating System
+    let selectedRating = 5; // Default 5 stars
+    const stars = starRating.querySelectorAll('.fa-star');
+
+    // Initialize all stars as active (5 stars default)
+    stars.forEach(star => star.classList.add('active'));
+
+    // Hover effect
+    stars.forEach((star, index) => {
+        star.addEventListener('mouseenter', () => {
+            stars.forEach((s, i) => {
+                if (i <= index) {
+                    s.classList.add('active');
+                } else {
+                    s.classList.remove('active');
+                }
+            });
+        });
+    });
+
+    // Reset to selected rating on mouse leave
+    starRating.addEventListener('mouseleave', () => {
+        stars.forEach((s, i) => {
+            if (i < selectedRating) {
+                s.classList.add('active');
+            } else {
+                s.classList.remove('active');
+            }
+        });
+    });
+
+    // Click to select rating
+    stars.forEach((star) => {
+        star.addEventListener('click', () => {
+            selectedRating = parseInt(star.getAttribute('data-rating'));
+            ratingInput.value = selectedRating;
+            
+            stars.forEach((s, i) => {
+                if (i < selectedRating) {
+                    s.classList.add('active');
+                } else {
+                    s.classList.remove('active');
+                }
+            });
+        });
+    });
+
+    // Load and Display Reviews
+    const loadReviews = () => {
+        const reviews = JSON.parse(localStorage.getItem('portfolioReviews') || '[]');
+        
+        if (reviews.length === 0) {
+            reviewsGrid.innerHTML = `
+                <div class="glass-card review-card" style="text-align: center; padding: 3rem 2rem;">
+                    <i class="fas fa-comments" style="font-size: 3rem; color: var(--accent); margin-bottom: 1rem; opacity: 0.5;"></i>
+                    <p style="color: var(--text-secondary);">No reviews yet. Be the first to leave a review!</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Sort reviews by date (newest first)
+        reviews.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        reviewsGrid.innerHTML = reviews.map((review, index) => {
+            const starsHTML = Array(5).fill(0).map((_, i) => 
+                `<i class="fas fa-star" style="color: ${i < review.rating ? 'var(--accent)' : '#334155'}; font-size: 0.9rem;"></i>`
+            ).join('');
+
+            const initials = review.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+            const avatarColors = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4'];
+            const avatarColor = avatarColors[index % avatarColors.length];
+
+            return `
+                <div class="glass-card review-card" style="animation: navLinkFade 0.5s ease forwards ${index * 0.1}s; opacity: 0;">
+                    <div class="review-header">
+                        <div class="review-avatar" style="background: ${avatarColor};">
+                            ${initials}
+                        </div>
+                        <div class="review-info">
+                            <h4 style="margin: 0; font-size: 1rem;">${review.name}</h4>
+                            ${review.role ? `<p style="margin: 0; color: var(--text-secondary); font-size: 0.85rem;">${review.role}</p>` : ''}
+                            <div class="review-stars" style="margin-top: 0.25rem;">
+                                ${starsHTML}
+                            </div>
+                        </div>
+                    </div>
+                    <p class="review-text">${review.text}</p>
+                    <p class="review-date">${formatDate(review.date)}</p>
+                </div>
+            `;
+        }).join('');
+    };
+
+    // Format date nicely
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffTime = Math.abs(now - date);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays === 0) return 'Today';
+        if (diffDays === 1) return 'Yesterday';
+        if (diffDays < 7) return `${diffDays} days ago`;
+        if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+        
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    };
+
+    // Handle Form Submission
+    reviewForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const name = document.getElementById('reviewerName').value.trim();
+        const role = document.getElementById('reviewerRole').value.trim();
+        const rating = parseInt(ratingInput.value);
+        const text = document.getElementById('reviewText').value.trim();
+
+        if (!name || !text || rating < 1 || rating > 5) {
+            alert('Please fill in all required fields correctly.');
+            return;
+        }
+
+        // Create review object
+        const review = {
+            id: Date.now(),
+            name: name,
+            role: role,
+            rating: rating,
+            text: text,
+            date: new Date().toISOString()
+        };
+
+        // Save to localStorage
+        const reviews = JSON.parse(localStorage.getItem('portfolioReviews') || '[]');
+        reviews.push(review);
+        localStorage.setItem('portfolioReviews', JSON.stringify(reviews));
+
+        // Show success message
+        const formCard = reviewForm.closest('.glass-card');
+        const originalHTML = formCard.innerHTML;
+        
+        formCard.innerHTML = `
+            <div style="text-align: center; padding: 2rem; animation: navLinkFade 0.5s ease forwards;">
+                <i class="fas fa-check-circle" style="font-size: 4rem; color: #10b981; margin-bottom: 1rem;"></i>
+                <h3 style="margin-bottom: 0.5rem;">Thank You!</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Your review has been submitted successfully.</p>
+                <button onclick="location.reload()" class="btn btn-primary" style="border: none;">
+                    <i class="fas fa-plus" style="margin-right: 0.5rem;"></i>
+                    Add Another Review
+                </button>
+            </div>
+        `;
+
+        // Reload reviews
+        loadReviews();
+
+        // Scroll to reviews section
+        setTimeout(() => {
+            document.getElementById('reviewsDisplay').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 500);
+    });
+
+    // Initial load
+    loadReviews();
+};
+
+// Initialize Review System
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initReviewSystem);
+} else {
+    initReviewSystem();
+}

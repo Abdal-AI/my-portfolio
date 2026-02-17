@@ -478,7 +478,7 @@ const initReviewSystem = () => {
     };
 
     // Load and Display Reviews
-    const loadReviews = async () => {
+    const loadReviews = async (showAll = false) => {
         try {
             const reviews = await fetchReviews();
             
@@ -495,7 +495,12 @@ const initReviewSystem = () => {
             // Sort reviews by date (newest first)
             reviews.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-            reviewsGrid.innerHTML = reviews.map((review, index) => {
+            // Determine how many reviews to show
+            const INITIAL_REVIEWS = 3;
+            const reviewsToShow = showAll ? reviews : reviews.slice(0, INITIAL_REVIEWS);
+            const hasMoreReviews = reviews.length > INITIAL_REVIEWS;
+
+            reviewsGrid.innerHTML = reviewsToShow.map((review, index) => {
                 const starsHTML = Array(5).fill(0).map((_, i) => 
                     `<i class="fas fa-star" style="color: ${i < review.rating ? 'var(--accent)' : '#334155'}; font-size: 0.9rem;"></i>`
                 ).join('');
@@ -523,6 +528,42 @@ const initReviewSystem = () => {
                     </div>
                 `;
             }).join('');
+
+            // Add "Show All Reviews" button if there are more reviews
+            if (hasMoreReviews && !showAll) {
+                const showAllBtn = document.createElement('div');
+                showAllBtn.style.cssText = 'grid-column: 1 / -1; text-align: center; margin-top: 2rem;';
+                showAllBtn.innerHTML = `
+                    <button id="showAllReviewsBtn" class="btn btn-primary" style="border: none; min-width: 200px;">
+                        <i class="fas fa-chevron-down" style="margin-right: 0.5rem;"></i>
+                        Show All Reviews (${reviews.length})
+                    </button>
+                `;
+                reviewsGrid.appendChild(showAllBtn);
+
+                // Add click event to show all reviews
+                document.getElementById('showAllReviewsBtn').addEventListener('click', () => {
+                    loadReviews(true);
+                });
+            } else if (showAll && hasMoreReviews) {
+                // Add "Show Less" button when all reviews are displayed
+                const showLessBtn = document.createElement('div');
+                showLessBtn.style.cssText = 'grid-column: 1 / -1; text-align: center; margin-top: 2rem;';
+                showLessBtn.innerHTML = `
+                    <button id="showLessReviewsBtn" class="btn btn-outline" style="border: 2px solid var(--accent); min-width: 200px;">
+                        <i class="fas fa-chevron-up" style="margin-right: 0.5rem;"></i>
+                        Show Less
+                    </button>
+                `;
+                reviewsGrid.appendChild(showLessBtn);
+
+                // Add click event to collapse reviews
+                document.getElementById('showLessReviewsBtn').addEventListener('click', () => {
+                    loadReviews(false);
+                    // Scroll to reviews section
+                    document.getElementById('reviewsDisplay').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+            }
         } catch (error) {
             console.error('Error loading reviews:', error);
         }

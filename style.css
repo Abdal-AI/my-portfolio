@@ -34,11 +34,14 @@ body {
     color: var(--text-primary);
     line-height: 1.7;
     font-size: 1.0625rem; /* 17px base */
-    overflow-x: hidden;
+    /* NOTE: overflow-x:hidden on body blocks iOS touch events — use max-width+clip instead */
+    overflow-x: clip;
     background-image:
         radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.1) 0%, transparent 40%),
         radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.15) 0%, transparent 40%);
     min-height: 100vh;
+    /* iOS momentum scrolling */
+    -webkit-overflow-scrolling: touch;
 }
 
 /* ==========================================
@@ -79,23 +82,31 @@ p {
 a {
     text-decoration: none;
     color: inherit;
-    transition: var(--transition);
-    position: relative;
-    z-index: 100; /* Sensible default z-index */
-    pointer-events: auto !important;
+    transition: color 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+    /* REMOVED: position:relative + z-index:100 — causes stacking context bugs on mobile */
+    pointer-events: auto;
+    -webkit-tap-highlight-color: rgba(56, 189, 248, 0.25);
+    touch-action: manipulation;
 }
 
-button, 
-input, 
-textarea, 
-select {
-    pointer-events: auto !important;
+button {
+    pointer-events: auto;
     cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(56, 189, 248, 0.25);
+    -webkit-appearance: none;
+    appearance: none;
 }
 
-/* Fix input cursor */
-input, textarea {
+input,
+textarea,
+select {
+    pointer-events: auto;
     cursor: text;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(56, 189, 248, 0.15);
+    /* Prevent iOS zoom on focus (font-size must be >= 16px) */
+    font-size: max(16px, 1rem);
 }
 
 img {
@@ -116,13 +127,15 @@ img {
 
 section {
     position: relative;
+    /* Sections must NOT create a new stacking context that traps z-index */
+    isolation: auto;
 }
 
 /* Ensure glass cards are interactive */
 .glass-card {
-    pointer-events: auto !important;
+    pointer-events: auto;
     position: relative;
-    z-index: 10;
+    /* No z-index here — avoid accidental stacking context on mobile */
 }
 
 .section-padding {
@@ -165,23 +178,23 @@ section {
     font-size: 1rem;
     cursor: pointer;
     border: 2px solid transparent;
-    transition: all 0.2s ease;
+    transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, color 0.2s ease;
     text-align: center;
-    position: relative;
-    z-index: 150; /* Above regular links */
-    pointer-events: auto !important;
-    isolation: isolate; /* Create new stacking context */
+    /* No rogue z-index or isolation — these break mobile stacking */
+    pointer-events: auto;
     touch-action: manipulation;
-    -webkit-tap-highlight-color: rgba(56, 189, 248, 0.4);
+    -webkit-tap-highlight-color: rgba(56, 189, 248, 0.35);
     -webkit-touch-callout: none;
     user-select: none;
     gap: 0.5rem;
     text-decoration: none;
     line-height: 1.2;
+    -webkit-appearance: none;
+    appearance: none;
 }
 
-/* Ensure buttons are always clickable */
-.btn * {
+/* Icons/text inside buttons should not capture events separately */
+.btn > * {
     pointer-events: none;
 }
 
@@ -228,11 +241,11 @@ header {
     position: fixed;
     top: 0;
     width: 100%;
-    z-index: 25000; /* Absolute Top */
-    transition: var(--transition);
+    z-index: 1000;
+    transition: background 0.3s ease, padding 0.3s ease, box-shadow 0.3s ease;
     background: rgba(15, 23, 42, 0.98);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    pointer-events: auto !important;
+    pointer-events: auto;
 }
 
 /* Header spacing fixed */
@@ -265,9 +278,11 @@ nav {
     display: flex;
     flex-direction: column;
     cursor: pointer;
-    z-index: 21000;
-    padding: 10px;
-    margin: -10px;
+    z-index: 1200; /* Above nav overlay */
+    padding: 12px;
+    margin: -12px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(56,189,248,0.2);
 }
 
 .burger div {
@@ -306,8 +321,8 @@ nav {
     justify-content: center;
     width: 100%;
     transform: translateX(100%);
-    transition: transform 0.4s cubic-bezier(0.77, 0, 0.175, 1);
-    z-index: 26000;
+    transition: transform 0.4s cubic-bezier(0.77, 0, 0.175, 1), visibility 0.4s, opacity 0.4s;
+    z-index: 1100;
     padding: 0;
     list-style: none;
     pointer-events: none;
@@ -317,7 +332,7 @@ nav {
 
 .nav-links.nav-active {
     transform: translateX(0%);
-    pointer-events: auto !important;
+    pointer-events: auto;
     visibility: visible;
     opacity: 1;
 }
@@ -327,22 +342,23 @@ nav {
     opacity: 1;
     width: 100%;
     text-align: center;
-    pointer-events: auto !important;
+    pointer-events: auto;
 }
 
 .nav-links a {
     font-weight: 700;
     color: #ffffff !important;
-    font-size: 1.8rem; /* Even larger for touch */
-    position: relative;
+    font-size: 1.8rem;
+    /* No z-index — nav is already on top via parent */
     padding: 1.5rem 2rem;
     display: block;
     width: 100%;
-    transition: all 0.3s ease;
+    transition: color 0.3s ease, background 0.3s ease;
     cursor: pointer;
     text-align: center;
-    z-index: 27000;
-    pointer-events: auto !important;
+    touch-action: manipulation;
+    pointer-events: auto;
+    -webkit-tap-highlight-color: rgba(56, 189, 248, 0.25);
 }
 
 .nav-links a:hover,
@@ -595,7 +611,7 @@ footer {
     position: fixed;
     bottom: 1rem;
     right: 1rem;
-    z-index: 9999;
+    z-index: 900; /* Below header (1000) so it doesn't block nav */
     display: flex;
     flex-direction: column;
     align-items: flex-end;
@@ -1399,8 +1415,12 @@ select:focus-visible,
     border-radius: 10px;
     color: var(--text-primary);
     font-family: var(--font-main);
-    font-size: 1rem;
+    font-size: 16px; /* >= 16px prevents iOS auto-zoom on focus */
     transition: all 0.3s ease;
+    touch-action: manipulation;
+    -webkit-appearance: none;
+    appearance: none;
+    min-height: 52px;
 }
 
 .review-form input[type="text"]:focus,
@@ -1572,7 +1592,7 @@ select:focus-visible,
     position: fixed;
     bottom: 1rem;
     right: 1rem;
-    z-index: 9999;
+    z-index: 900;
     display: flex;
     flex-direction: column;
     align-items: flex-end;

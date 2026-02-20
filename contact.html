@@ -106,10 +106,6 @@
             min-height: 60px;
             text-decoration: none;
             color: inherit;
-            position: relative;
-            z-index: 100;
-            pointer-events: auto !important;
-            touch-action: manipulation;
         }
 
         .social-link:hover {
@@ -121,21 +117,6 @@
         .social-link h4 {
             margin: 0 0 0.25rem 0;
             font-size: 1.1rem;
-        }
-
-        /* Ensure form elements are clickable */
-        .contact-form input,
-        .contact-form select,
-        .contact-form textarea,
-        .contact-form button {
-            position: relative;
-            z-index: 100;
-            pointer-events: auto !important;
-        }
-
-        .contact-grid {
-            position: relative;
-            z-index: 10;
         }
     </style>
 </head>
@@ -224,11 +205,15 @@
                 <!-- Contact Form -->
                 <div class="glass-card">
                     <h3 style="margin-bottom: 2rem;">Send a Message</h3>
-                    <form class="contact-form" action="https://formsubmit.co/muhammadabdal15140@gmail.com"
+                    <form class="contact-form" action="https://formsubmit.co/ajax/muhammadabdal15140@gmail.com"
                         method="POST">
 
-                        <!-- <input type="hidden" name="_captcha" value="false"> -->
-                        <!-- <input type="hidden" name="_next" value="https://abdalkhan.com.pk/contact.html"> -->
+                        <!-- FormSubmit.co configuration -->
+                        <input type="hidden" name="_captcha" value="false">
+                        <input type="hidden" name="_template" value="table">
+                        <input type="hidden" name="_subject" value="New Contact Form Message from Portfolio">
+                        <input type="hidden" name="_autoresponse"
+                            value="Hi there! Thanks for reaching out. Abdal will reply within 24 hours. — Portfolio Bot">
 
                         <div class="form-row">
                             <div>
@@ -248,7 +233,7 @@
                                 <option style="background: var(--bg-dark);">Portfolio Website ($60)</option>
                                 <option style="background: var(--bg-dark);">Business Website ($100)</option>
                                 <option style="background: var(--bg-dark);">E-commerce Store ($200)</option>
-                                <option style="background: var(--bg-dark);">Data Cleaning & Analysis ($80)</option>
+                                <option style="background: var(--bg-dark);">Data Cleaning &amp; Analysis ($80)</option>
                                 <option style="background: var(--bg-dark);">n8n Workflow Automation ($120)</option>
                                 <option style="background: var(--bg-dark);">Interactive Dashboard ($150)</option>
                                 <option style="background: var(--bg-dark);">Custom Quote</option>
@@ -261,8 +246,10 @@
                                 required></textarea>
                         </div>
 
-                        <button type="submit" class="btn btn-primary"
-                            style="width: 100%; border: none; font-size: 1.1rem; font-weight: 700;">Send Message</button>
+                        <button type="submit" class="btn btn-primary" id="contactSubmitBtn"
+                            style="width: 100%; border: none; font-size: 1.1rem; font-weight: 700;">
+                            <i class="fas fa-paper-plane" style="margin-right: 0.5rem;"></i>Send Message
+                        </button>
                     </form>
                 </div>
             </div>

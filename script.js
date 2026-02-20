@@ -1,32 +1,146 @@
-// Initialize Main Logic
+// ============================================================
+// CONFIGURATION — Update these values with your own API keys
+// ============================================================
+const CONFIG = {
+    // formsubmit.co — Contact form email (already configured in HTML)
+    CONTACT_EMAIL: 'muhammadabdal15140@gmail.com',
+
+    // Web3Forms — Free email notifications for reviews
+    // Get your free key at: https://web3forms.com/
+    WEB3FORMS_KEY: 'YOUR_WEB3FORMS_ACCESS_KEY',  // ← Replace this
+
+    // JSONBin.io — Free global cloud storage for reviews
+    // Steps: 1) Go to https://jsonbin.io  2) Sign up free  3) Create a Bin with []  4) Copy the BIN ID & API KEY below
+    JSONBIN_BIN_ID: 'YOUR_JSONBIN_BIN_ID',        // ← Replace this (looks like: 65abc1234def567890)
+    JSONBIN_API_KEY: 'YOUR_JSONBIN_API_KEY',       // ← Replace this (looks like: $2a$10$...)
+
+    // Notification sound (optional)
+    NOTIFICATION_ICON: 'new_logo.png'
+};
+
+// ============================================================
+// TOAST NOTIFICATION SYSTEM
+// ============================================================
+const Toast = {
+    container: null,
+
+    init() {
+        if (this.container) return;
+        this.container = document.createElement('div');
+        this.container.id = 'toast-container';
+        this.container.style.cssText = `
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            pointer-events: none;
+        `;
+        document.body.appendChild(this.container);
+    },
+
+    show(message, type = 'success', duration = 4000) {
+        this.init();
+
+        const colors = {
+            success: { bg: 'linear-gradient(135deg, #10b981, #059669)', icon: '✅' },
+            error:   { bg: 'linear-gradient(135deg, #ef4444, #dc2626)', icon: '❌' },
+            info:    { bg: 'linear-gradient(135deg, #3b82f6, #2563eb)', icon: 'ℹ️' },
+            warning: { bg: 'linear-gradient(135deg, #f59e0b, #d97706)', icon: '⚠️' }
+        };
+
+        const { bg, icon } = colors[type] || colors.success;
+
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            background: ${bg};
+            color: #fff;
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            max-width: 360px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            pointer-events: all;
+            transform: translateX(120%);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: pointer;
+        `;
+        toast.innerHTML = `<span style="font-size:1.2rem">${icon}</span><span>${message}</span>`;
+        toast.addEventListener('click', () => this.dismiss(toast));
+
+        this.container.appendChild(toast);
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                toast.style.transform = 'translateX(0)';
+            });
+        });
+
+        setTimeout(() => this.dismiss(toast), duration);
+    },
+
+    dismiss(toast) {
+        toast.style.transform = 'translateX(120%)';
+        setTimeout(() => toast.remove(), 400);
+    }
+};
+
+// ============================================================
+// BROWSER PUSH NOTIFICATION REQUEST
+// ============================================================
+const requestNotificationPermission = async () => {
+    if (!('Notification' in window)) return;
+    if (Notification.permission === 'default') {
+        await Notification.requestPermission();
+    }
+};
+
+const sendBrowserNotification = (title, body) => {
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+    new Notification(title, {
+        body,
+        icon: CONFIG.NOTIFICATION_ICON,
+        badge: CONFIG.NOTIFICATION_ICON,
+        vibrate: [200, 100, 200]
+    });
+};
+
+// ============================================================
+// MAIN INIT (Nav, Scroll, Mobile Menu)
+// ============================================================
 const initMain = () => {
     // Dynamic Year
     const yearSpan = document.getElementById('year');
-    if (yearSpan) {
-        yearSpan.textContent = new Date().getFullYear();
-    }
+    if (yearSpan) yearSpan.textContent = new Date().getFullYear();
 
     // Header Scroll Effect
     const header = document.querySelector('header');
     if (header) {
         window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) {
-                header.classList.add('scrolled');
-            } else {
-                header.classList.remove('scrolled');
-            }
+            header.classList.toggle('scrolled', window.scrollY > 50);
         });
     }
 
     // Mobile Nav Toggle
-    const styles = `
+    const styleSheet = document.createElement('style');
+    styleSheet.innerText = `
         @keyframes navLinkFade {
             from { opacity: 0; transform: translateX(50px); }
-            to { opacity: 1; transform: translateX(0); }
+            to   { opacity: 1; transform: translateX(0); }
         }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .fa-spin { animation: spin 1s linear infinite; }
     `;
-    const styleSheet = document.createElement("style");
-    styleSheet.innerText = styles;
     document.head.appendChild(styleSheet);
 
     const burger = document.querySelector('.burger');
@@ -36,35 +150,30 @@ const initMain = () => {
     if (burger) {
         burger.addEventListener('click', (e) => {
             e.stopPropagation();
-            // Toggle Nav
             nav.classList.toggle('nav-active');
             burger.classList.toggle('toggle');
-
-            // Animate Links
             navLinks.forEach((link, index) => {
-                if (link.style.animation) {
-                    link.style.animation = '';
-                } else {
-                    link.style.animation = `navLinkFade 0.5s ease forwards ${index / 7 + 0.3}s`;
-                }
+                link.style.animation = link.style.animation
+                    ? ''
+                    : `navLinkFade 0.5s ease forwards ${index / 7 + 0.3}s`;
             });
         });
 
-        // Close menu when clicking outside or on a link
         document.addEventListener('click', (e) => {
             if (nav.classList.contains('nav-active') && !nav.contains(e.target) && !burger.contains(e.target)) {
                 nav.classList.remove('nav-active');
                 burger.classList.remove('toggle');
+                navLinks.forEach(li => li.style.animation = '');
             }
         });
 
-        // Close menu when a link is clicked
         navLinks.forEach(li => {
             const link = li.querySelector('a');
             if (link) {
                 link.addEventListener('click', () => {
                     nav.classList.remove('nav-active');
                     burger.classList.remove('toggle');
+                    navLinks.forEach(l => l.style.animation = '');
                 });
             }
         });
@@ -77,9 +186,10 @@ if (document.readyState === 'loading') {
     initMain();
 }
 
-// Simple Chatbot (No API Required)
+// ============================================================
+// CHATBOT
+// ============================================================
 const initChatBot = () => {
-    // Knowledge base about Abdal
     const knowledge = {
         name: "Muhammad Abdal",
         email: "muhammadabdal15140@gmail.com",
@@ -89,115 +199,57 @@ const initChatBot = () => {
         linkedin: "https://www.linkedin.com/in/muhammad-abdal-619451299/",
         kaggle: "https://www.kaggle.com/muhammadabdal123",
         services: {
-            portfolio: { name: "Portfolio Website", price: "$60", features: "5-Page Responsive Site, Contact Form, Social Links, Basic SEO" },
-            business: { name: "Business Website", price: "$100", features: "Up to 10 Pages, Booking System, Live Chat, Google Analytics" },
-            ecommerce: { name: "E-commerce Store", price: "$200", features: "WooCommerce Setup, 50 Products, Payment Gateway, Discounts" },
-            data: { name: "Data Cleaning & Analysis", price: "$80", features: "Python/Pandas, Data Formatting, Exploratory Analysis" },
-            automation: { name: "n8n Workflow Automation", price: "$120", features: "1 Complex Workflow, API Integrations, Error Handling" },
-            dashboard: { name: "Interactive Dashboard", price: "$150", features: "Power BI or Streamlit, 5 Visualizations, Interactive Filters" }
+            portfolio:  { name: "Portfolio Website",        price: "$60",  features: "5-Page Responsive Site, Contact Form, Social Links, Basic SEO" },
+            business:   { name: "Business Website",         price: "$100", features: "Up to 10 Pages, Booking System, Live Chat, Google Analytics" },
+            ecommerce:  { name: "E-commerce Store",         price: "$200", features: "WooCommerce Setup, 50 Products, Payment Gateway, Discounts" },
+            data:       { name: "Data Cleaning & Analysis", price: "$80",  features: "Python/Pandas, Data Formatting, Exploratory Analysis" },
+            automation: { name: "n8n Workflow Automation",  price: "$120", features: "1 Complex Workflow, API Integrations, Error Handling" },
+            dashboard:  { name: "Interactive Dashboard",    price: "$150", features: "Power BI or Streamlit, 5 Visualizations, Interactive Filters" }
         },
         skills: ["WordPress", "Python", "n8n Automation", "Data Science", "Machine Learning", "Power BI", "WooCommerce", "Elementor Pro"],
         projects: ["Luxe Cosmetics E-commerce", "Face Recognition System", "Sales Dashboard", "CRM Sync Workflow", "Titanic Survival Prediction"]
     };
 
-    // Response patterns
     const getResponse = (input) => {
         const msg = input.toLowerCase().trim();
-        
-        // Greetings
-        if (/^(hi|hello|hey|hola|greetings|good morning|good afternoon|good evening)/.test(msg)) {
+        if (/^(hi|hello|hey|hola|greetings|good morning|good afternoon|good evening)/.test(msg))
             return `👋 Hello! I'm Abdal's assistant. I can help you with:\n\n• **Services & Pricing**\n• **Contact Information**\n• **Projects & Portfolio**\n• **Skills & Expertise**\n\nWhat would you like to know?`;
-        }
-        
-        // Pricing / Services
         if (/price|pricing|cost|how much|rate|charge|package|service/i.test(msg)) {
-            if (/portfolio/i.test(msg)) {
-                return `📁 **Portfolio Website - ${knowledge.services.portfolio.price}**\n\nIncludes: ${knowledge.services.portfolio.features}\n\nPerfect for freelancers and creatives!\n\n👉 [Order Now](contact.html)`;
-            }
-            if (/business/i.test(msg)) {
-                return `🏢 **Business Website - ${knowledge.services.business.price}**\n\nIncludes: ${knowledge.services.business.features}\n\nIdeal for growing businesses!\n\n👉 [Order Now](contact.html)`;
-            }
-            if (/ecommerce|e-commerce|shop|store/i.test(msg)) {
-                return `🛒 **E-commerce Store - ${knowledge.services.ecommerce.price}**\n\nIncludes: ${knowledge.services.ecommerce.features}\n\nStart selling online today!\n\n👉 [Order Now](contact.html)`;
-            }
-            if (/data|cleaning|analysis/i.test(msg)) {
-                return `📊 **Data Cleaning & Analysis - ${knowledge.services.data.price}**\n\nIncludes: ${knowledge.services.data.features}\n\nTurn raw data into insights!\n\n👉 [Order Now](contact.html)`;
-            }
-            if (/automation|n8n|workflow/i.test(msg)) {
-                return `⚙️ **n8n Workflow Automation - ${knowledge.services.automation.price}**\n\nIncludes: ${knowledge.services.automation.features}\n\nAutomate your busy work!\n\n👉 [Order Now](contact.html)`;
-            }
-            if (/dashboard|power bi|visualization/i.test(msg)) {
-                return `📈 **Interactive Dashboard - ${knowledge.services.dashboard.price}**\n\nIncludes: ${knowledge.services.dashboard.features}\n\nVisualize your metrics!\n\n👉 [Order Now](contact.html)`;
-            }
-            // General pricing
+            if (/portfolio/i.test(msg))   return `📁 **Portfolio Website - ${knowledge.services.portfolio.price}**\n\nIncludes: ${knowledge.services.portfolio.features}\n\nPerfect for freelancers and creatives!\n\n👉 [Order Now](contact.html)`;
+            if (/business/i.test(msg))    return `🏢 **Business Website - ${knowledge.services.business.price}**\n\nIncludes: ${knowledge.services.business.features}\n\nIdeal for growing businesses!\n\n👉 [Order Now](contact.html)`;
+            if (/ecommerce|e-commerce|shop|store/i.test(msg)) return `🛒 **E-commerce Store - ${knowledge.services.ecommerce.price}**\n\nIncludes: ${knowledge.services.ecommerce.features}\n\nStart selling online today!\n\n👉 [Order Now](contact.html)`;
+            if (/data|cleaning|analysis/i.test(msg)) return `📊 **Data Cleaning & Analysis - ${knowledge.services.data.price}**\n\nIncludes: ${knowledge.services.data.features}\n\nTurn raw data into insights!\n\n👉 [Order Now](contact.html)`;
+            if (/automation|n8n|workflow/i.test(msg)) return `⚙️ **n8n Workflow Automation - ${knowledge.services.automation.price}**\n\nIncludes: ${knowledge.services.automation.features}\n\nAutomate your busy work!\n\n👉 [Order Now](contact.html)`;
+            if (/dashboard|power bi|visualization/i.test(msg)) return `📈 **Interactive Dashboard - ${knowledge.services.dashboard.price}**\n\nIncludes: ${knowledge.services.dashboard.features}\n\nVisualize your metrics!\n\n👉 [Order Now](contact.html)`;
             return `💰 **Service Pricing:**\n\n• Portfolio Website: **$60**\n• Business Website: **$100**\n• E-commerce Store: **$200**\n• Data Cleaning: **$80**\n• n8n Automation: **$120**\n• Dashboard: **$150**\n\nAsk about any specific service for details!`;
         }
-        
-        // Contact
-        if (/contact|email|reach|hire|message|whatsapp|phone|call/i.test(msg)) {
+        if (/contact|email|reach|hire|message|whatsapp|phone|call/i.test(msg))
             return `📬 **Contact Abdal:**\n\n📧 Email: ${knowledge.email}\n📱 WhatsApp: ${knowledge.whatsapp}\n💼 Fiverr: [Order a Gig](${knowledge.fiverr})\n\nOr use the [Contact Form](contact.html) to send a message directly!`;
-        }
-        
-        // Skills
-        if (/skill|expertise|technology|tech|stack|know|experience|specialize/i.test(msg)) {
+        if (/skill|expertise|technology|tech|stack|know|experience|specialize/i.test(msg))
             return `🛠️ **Abdal's Skills:**\n\n${knowledge.skills.map(s => `• ${s}`).join('\n')}\n\nSpecializing in Web Development, AI/ML, and Business Automation!`;
-        }
-        
-        // Projects / Portfolio
-        if (/project|portfolio|work|done|example|case study/i.test(msg)) {
+        if (/project|portfolio|work|done|example|case study/i.test(msg))
             return `🎯 **Featured Projects:**\n\n${knowledge.projects.map(p => `• ${p}`).join('\n')}\n\nView all projects: [Portfolio](portfolio.html)`;
-        }
-        
-        // About
-        if (/about|who|tell me|introduce|yourself/i.test(msg)) {
+        if (/about|who|tell me|introduce|yourself/i.test(msg))
             return `👨‍💻 **About ${knowledge.name}:**\n\nI'm a Web Developer, Data Scientist, and Automation Expert. I help businesses build stunning websites, analyze data for insights, and automate repetitive tasks.\n\n🏆 Top 1% on Kaggle\n⭐ 5.0 Rating on Fiverr\n💻 500+ GitHub Contributions`;
-        }
-        
-        // WordPress
-        if (/wordpress|wp|theme|elementor/i.test(msg)) {
+        if (/wordpress|wp|theme|elementor/i.test(msg))
             return `🌐 **WordPress Development:**\n\nI build custom WordPress sites using Elementor Pro with:\n• Custom themes & designs\n• WooCommerce integration\n• Speed optimization (95+ PageSpeed)\n• SEO-friendly structure\n\nStarting at **$60** for portfolio sites!`;
-        }
-        
-        // AI / Python
-        if (/ai|python|machine learning|ml|data science|artificial intelligence/i.test(msg)) {
+        if (/ai|python|machine learning|ml|data science|artificial intelligence/i.test(msg))
             return `🤖 **AI & Data Science:**\n\nI work with Python for:\n• Machine Learning models\n• Data analysis & visualization\n• Face recognition systems\n• Predictive analytics\n• Automation scripts\n\nCheck my [Kaggle Profile](${knowledge.kaggle})!`;
-        }
-        
-        // Automation
-        if (/automat|n8n|workflow|integrate|api/i.test(msg)) {
+        if (/automat|n8n|workflow|integrate|api/i.test(msg))
             return `⚙️ **Workflow Automation:**\n\nUsing n8n, I can automate:\n• Email notifications\n• CRM integrations (HubSpot, Salesforce)\n• Social media posting\n• Data syncing between apps\n• Custom API workflows\n\nStarting at **$120**!`;
-        }
-        
-        // Social links
-        if (/github|linkedin|twitter|kaggle|social/i.test(msg)) {
+        if (/github|linkedin|twitter|kaggle|social/i.test(msg))
             return `🔗 **Social Links:**\n\n• GitHub: [Abdal-AI](${knowledge.github})\n• LinkedIn: [Muhammad Abdal](${knowledge.linkedin})\n• Kaggle: [Profile](${knowledge.kaggle})\n• Twitter: [@abdalkhan1514](https://x.com/abdalkhan1514)`;
-        }
-        
-        // Thanks
-        if (/thank|thanks|thx|appreciate/i.test(msg)) {
-            return `😊 You're welcome! Is there anything else I can help you with? Feel free to ask about services, pricing, or how to get in touch!`;
-        }
-        
-        // Goodbye
-        if (/bye|goodbye|see you|later|exit|quit/i.test(msg)) {
-            return `👋 Goodbye! Thanks for visiting. Feel free to come back anytime or [contact Abdal](contact.html) directly!`;
-        }
-        
-        // Fiverr
-        if (/fiverr|gig|order|freelanc/i.test(msg)) {
-            return `💼 **Order on Fiverr:**\n\nYou can hire me directly on Fiverr with secure payments and guaranteed delivery!\n\n👉 [Visit My Fiverr Profile](${knowledge.fiverr})\n\n⭐ 5.0 Rating • Fast Delivery • 24/7 Support`;
-        }
-        
-        // Help
-        if (/help|what can you|how does|how do/i.test(msg)) {
+        if (/thank|thanks|thx|appreciate/i.test(msg))
+            return `😊 You're welcome! Is there anything else I can help you with?`;
+        if (/bye|goodbye|see you|later|exit|quit/i.test(msg))
+            return `👋 Goodbye! Thanks for visiting. Feel free to come back anytime!`;
+        if (/fiverr|gig|order|freelanc/i.test(msg))
+            return `💼 **Order on Fiverr:**\n\nYou can hire me directly on Fiverr!\n\n👉 [Visit My Fiverr Profile](${knowledge.fiverr})\n\n⭐ 5.0 Rating • Fast Delivery • 24/7 Support`;
+        if (/help|what can you|how does|how do/i.test(msg))
             return `🤖 **I can help you with:**\n\n• "What services do you offer?"\n• "How much does a website cost?"\n• "How can I contact you?"\n• "Tell me about your projects"\n• "What are your skills?"\n\nJust ask me anything!`;
-        }
-        
-        // Default response
         return `🤔 I'm not sure I understand. Try asking about:\n\n• **Services** - "What services do you offer?"\n• **Pricing** - "How much does a website cost?"\n• **Contact** - "How can I reach you?"\n• **Projects** - "Show me your work"\n\nOr visit the [Contact Page](contact.html) to message Abdal directly!`;
     };
 
-    // Inject HTML
     const chatHTML = `
     <div class="chat-widget">
         <div class="chat-window" id="chatWindow">
@@ -225,450 +277,441 @@ const initChatBot = () => {
     `;
     document.body.insertAdjacentHTML('beforeend', chatHTML);
 
-    // Elements
-    const toggleBtn = document.getElementById('toggleChat');
-    const closeBtn = document.getElementById('closeChat');
+    const toggleBtn  = document.getElementById('toggleChat');
+    const closeBtn   = document.getElementById('closeChat');
     const chatWindow = document.getElementById('chatWindow');
-    const input = document.getElementById('chatInput');
-    const sendBtn = document.getElementById('sendMessage');
-    const messages = document.getElementById('chatMessages');
+    const input      = document.getElementById('chatInput');
+    const sendBtn    = document.getElementById('sendMessage');
+    const messages   = document.getElementById('chatMessages');
 
-    // Toggle Chat
     const toggleChat = () => chatWindow.classList.toggle('active');
     toggleBtn.addEventListener('click', toggleChat);
     closeBtn.addEventListener('click', toggleChat);
 
-    // Add Message to UI
     const addMessage = (text, sender) => {
         const div = document.createElement('div');
         div.className = `message ${sender}`;
-        
-        let formattedText = text
+        div.innerHTML = text
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
             .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" style="color: var(--accent);">$1</a>')
             .replace(/\n/g, '<br>');
-        
-        div.innerHTML = formattedText;
         messages.appendChild(div);
         messages.scrollTop = messages.scrollHeight;
     };
 
-    // Send Message Logic
     const sendMessage = () => {
         const text = input.value.trim();
         if (!text) return;
-
         addMessage(text, 'user');
         input.value = '';
-
-        // Simulate brief "typing" delay
-        setTimeout(() => {
-            const response = getResponse(text);
-            addMessage(response, 'bot');
-        }, 300);
+        setTimeout(() => addMessage(getResponse(text), 'bot'), 300);
     };
 
-    // Event Listeners
     sendBtn.addEventListener('click', sendMessage);
     input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
-        }
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
     });
 };
 
-// Initialize after DOM Content Loaded (extending the existing event)
-// Note: Since we are appending this to the file, we can just run it or hook it.
-// The previous code block closed the DOMContentLoaded event.
-// We should check if document is already loaded or just run it if defer is used (it is).
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initChatBot);
 } else {
     initChatBot();
 }
 
-// Contact Form Logic (AJAX)
+// ============================================================
+// CONTACT FORM — formsubmit.co + Toast + Browser Notification
+// ============================================================
 const initContactForm = () => {
     const form = document.querySelector('.contact-form');
     if (!form) return;
 
-    form.addEventListener('submit', function(e) {
+    // Ask for notification permission on contact page
+    requestNotificationPermission();
+
+    form.addEventListener('submit', async function (e) {
         e.preventDefault();
-        
+
         const btn = form.querySelector('button[type="submit"]');
-        const originalText = btn.textContent;
-        
-        // Show loading state
-        btn.textContent = 'Sending...';
+        const originalHTML = btn.innerHTML;
+
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:0.5rem"></i>Sending...';
         btn.disabled = true;
         btn.style.opacity = '0.7';
 
         const formData = new FormData(form);
+        // Ensure JSON accept header for formsubmit.co
+        formData.append('_captcha', 'false');
 
-        fetch(form.action, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'Accept': 'application/json'
-            }
-        })
-        .then(response => {
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: { 'Accept': 'application/json' }
+            });
+
             if (response.ok) {
-                // Success - Replace form with success message
+                // Replace form with success card
                 form.innerHTML = `
-                    <div style="text-align: center; padding: 2rem; animation: navLinkFade 0.5s ease forwards;">
-                        <i class="fas fa-check-circle" style="font-size: 4rem; color: #1dbf73; margin-bottom: 1rem;"></i>
-                        <h3 style="margin-bottom: 1rem;">Message Sent!</h3>
-                        <p style="color: var(--text-secondary);">Thanks for reaching out. I'll get back to you shortly.</p>
-                        <button onclick="location.reload()" class="btn btn-primary" style="margin-top: 1.5rem; border: none;">Send Another</button>
+                    <div style="text-align: center; padding: 2rem; animation: fadeInUp 0.5s ease forwards;">
+                        <i class="fas fa-check-circle" style="font-size: 4rem; color: #10b981; margin-bottom: 1rem; display:block;"></i>
+                        <h3 style="margin-bottom: 0.75rem;">Message Sent! 🎉</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Thanks for reaching out! I'll reply to your email within 24 hours.</p>
+                        <button onclick="location.reload()" class="btn btn-primary" style="border: none;">
+                            <i class="fas fa-plus" style="margin-right: 0.5rem;"></i>Send Another
+                        </button>
                     </div>
                 `;
+                Toast.show('✅ Message sent! I\'ll reply within 24 hours.', 'success', 5000);
+                sendBrowserNotification('Message Sent!', 'Abdal will reply to your email within 24 hours.');
             } else {
-                // Error from server
-                return response.json().then(data => {
-                    if (Object.hasOwn(data, 'errors')) {
-                        alert(data["errors"].map(error => error["message"]).join(", "));
-                    } else {
-                        alert("Server Error: " + (data.message || "Unknown error"));
-                    }
-                }).catch(() => {
-                    // processing as text if json fails
-                    return response.text().then(text => {
-                        console.error("Server Error Response:", text);
-                         alert("Server Error (" + response.status + "): " + response.statusText + "\n\nPlease check the console or try again later.");
-                    });
-                });
-            }
-        })
-        .catch(error => {
-            alert("Oops! There was a problem connecting to the server. Please check your internet connection.");
-            console.error(error);
-        })
-        .finally(() => {
-            // Restore button if form still exists (it won't on success, but will on error)
-            if (form.contains(btn)) {
-                btn.textContent = originalText;
+                const data = await response.json().catch(() => ({}));
+                const msg = data?.errors?.map(e => e.message).join(', ') || data.message || 'Server error. Please try again.';
+                Toast.show(msg, 'error');
+                btn.innerHTML = originalHTML;
                 btn.disabled = false;
                 btn.style.opacity = '1';
             }
-        });
+        } catch (err) {
+            console.error(err);
+            Toast.show('Connection error. Please check your internet.', 'error');
+            btn.innerHTML = originalHTML;
+            btn.disabled = false;
+            btn.style.opacity = '1';
+        }
     });
 };
 
-// Initialize Contact Form
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initContactForm);
 } else {
     initContactForm();
 }
 
-// ============================
-// REVIEW SYSTEM - CLOUD STORAGE
-// ============================
-
+// ============================================================
+// REVIEW SYSTEM — JSONBin.io (global storage) + Web3Forms (email)
+// ============================================================
 const initReviewSystem = () => {
     const reviewForm = document.getElementById('reviewForm');
-    if (!reviewForm) return; // Only run on pages with review form
+    if (!reviewForm) return;
 
-    const starRating = document.getElementById('starRating');
+    const starRating  = document.getElementById('starRating');
     const ratingInput = document.getElementById('rating');
     const reviewsGrid = document.getElementById('reviewsGrid');
 
-    // Cloud storage configuration - Using Make.com webhook as backend
-    const REVIEWS_WEBHOOK = 'https://hook.eu2.make.com/YOUR_WEBHOOK_ID'; // You'll need to set this up
-    
-    // Fallback to localStorage if webhook fails
-    const STORAGE_KEY = 'portfolioReviews';
+    // Ask notification permission
+    requestNotificationPermission();
 
-    // Star Rating System
-    let selectedRating = 5; // Default 5 stars
+    // ── Star Rating ──────────────────────────────────────────
+    let selectedRating = 5;
     const stars = starRating.querySelectorAll('.fa-star');
+    stars.forEach(s => s.classList.add('active'));
 
-    // Initialize all stars as active (5 stars default)
-    stars.forEach(star => star.classList.add('active'));
-
-    // Hover effect
     stars.forEach((star, index) => {
         star.addEventListener('mouseenter', () => {
-            stars.forEach((s, i) => {
-                if (i <= index) {
-                    s.classList.add('active');
-                } else {
-                    s.classList.remove('active');
-                }
-            });
+            stars.forEach((s, i) => s.classList.toggle('active', i <= index));
         });
-    });
-
-    // Reset to selected rating on mouse leave
-    starRating.addEventListener('mouseleave', () => {
-        stars.forEach((s, i) => {
-            if (i < selectedRating) {
-                s.classList.add('active');
-            } else {
-                s.classList.remove('active');
-            }
-        });
-    });
-
-    // Click to select rating
-    stars.forEach((star) => {
         star.addEventListener('click', () => {
             selectedRating = parseInt(star.getAttribute('data-rating'));
             ratingInput.value = selectedRating;
-            
-            stars.forEach((s, i) => {
-                if (i < selectedRating) {
-                    s.classList.add('active');
-                } else {
-                    s.classList.remove('active');
-                }
-            });
+            stars.forEach((s, i) => s.classList.toggle('active', i < selectedRating));
         });
     });
 
-    // Fetch reviews from cloud storage or localStorage
-    const fetchReviews = async () => {
-        try {
-            // Try to fetch from cloud (you can use a simple JSON file hosted on GitHub)
-            // For now, we'll use localStorage but displayed as if it's shared
-            const localReviews = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            
-            // Add some default demo reviews if empty (these will show to all visitors)
-            if (localReviews.length === 0) {
-                return getDemoReviews();
-            }
-            
-            return localReviews;
-        } catch (error) {
-            console.error('Error fetching reviews:', error);
-            return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    starRating.addEventListener('mouseleave', () => {
+        stars.forEach((s, i) => s.classList.toggle('active', i < selectedRating));
+    });
+
+    // ── JSONBin Helpers ──────────────────────────────────────
+    const JSONBIN_URL  = `https://api.jsonbin.io/v3/b/${CONFIG.JSONBIN_BIN_ID}`;
+    const JSONBIN_HEADERS = {
+        'Content-Type': 'application/json',
+        'X-Master-Key': CONFIG.JSONBIN_API_KEY
+    };
+
+    const useCloud = () =>
+        CONFIG.JSONBIN_BIN_ID !== 'YOUR_JSONBIN_BIN_ID' &&
+        CONFIG.JSONBIN_API_KEY !== 'YOUR_JSONBIN_API_KEY';
+
+    const fetchReviewsFromCloud = async () => {
+        const res = await fetch(JSONBIN_URL, { headers: JSONBIN_HEADERS });
+        if (!res.ok) throw new Error('JSONBin fetch failed: ' + res.status);
+        const json = await res.json();
+        return Array.isArray(json.record) ? json.record : [];
+    };
+
+    const saveReviewsToCloud = async (reviews) => {
+        const res = await fetch(JSONBIN_URL, {
+            method: 'PUT',
+            headers: JSONBIN_HEADERS,
+            body: JSON.stringify(reviews)
+        });
+        if (!res.ok) throw new Error('JSONBin save failed: ' + res.status);
+    };
+
+    // ── Email Notification via Web3Forms ────────────────────
+    const sendEmailNotification = async (review) => {
+        if (CONFIG.WEB3FORMS_KEY === 'YOUR_WEB3FORMS_ACCESS_KEY') return; // skip if not set up
+
+        await fetch('https://api.web3forms.com/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({
+                access_key: CONFIG.WEB3FORMS_KEY,
+                subject: `⭐ New ${review.rating}-Star Review from ${review.name}`,
+                from_name: 'Portfolio Review System',
+                name: review.name,
+                email: CONFIG.CONTACT_EMAIL,
+                message: `
+New review received on your portfolio!
+
+👤 Name:    ${review.name}
+🏢 Role:    ${review.role || 'N/A'}
+⭐ Rating:  ${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)} (${review.rating}/5)
+📅 Date:    ${new Date(review.date).toLocaleString()}
+
+💬 Review:
+${review.text}
+
+---
+This review is now live on your portfolio website.
+                `.trim()
+            })
+        });
+    };
+
+    // ── Demo reviews (fallback when no cloud configured) ────
+    const getDemoReviews = () => [
+        {
+            id: 1,
+            name: "Sarah Johnson",
+            role: "CEO at TechStart",
+            rating: 5,
+            text: "Exceptional work! Abdal built our e-commerce site and it's been running flawlessly. His attention to detail and quick turnaround time exceeded our expectations.",
+            date: new Date(Date.now() - 7  * 86400000).toISOString()
+        },
+        {
+            id: 2,
+            name: "Michael Chen",
+            role: "Marketing Director",
+            rating: 5,
+            text: "The WordPress site looks amazing and loads super fast. Great communication throughout the project. Highly recommend!",
+            date: new Date(Date.now() - 14 * 86400000).toISOString()
+        },
+        {
+            id: 3,
+            name: "Emma Rodriguez",
+            role: "Small Business Owner",
+            rating: 5,
+            text: "Abdal helped automate our workflow with n8n. Saved us hours of manual work every week. Professional and knowledgeable!",
+            date: new Date(Date.now() - 21 * 86400000).toISOString()
         }
-    };
+    ];
 
-    // Demo reviews that everyone can see
-    const getDemoReviews = () => {
-        return [
-            {
-                id: 1,
-                name: "Sarah Johnson",
-                role: "CEO at TechStart",
-                rating: 5,
-                text: "Exceptional work! Abdal built our e-commerce site and it's been running flawlessly. His attention to detail and quick turnaround time exceeded our expectations.",
-                date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
-            },
-            {
-                id: 2,
-                name: "Michael Chen",
-                role: "Marketing Director",
-                rating: 5,
-                text: "The WordPress site looks amazing and loads super fast. Great communication throughout the project. Highly recommend!",
-                date: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString()
-            },
-            {
-                id: 3,
-                name: "Emma Rodriguez",
-                role: "Small Business Owner",
-                rating: 5,
-                text: "Abdal helped automate our workflow with n8n. Saved us hours of manual work every week. Professional and knowledgeable!",
-                date: new Date(Date.now() - 21 * 24 * 60 * 60 * 1000).toISOString()
+    // ── Fetch reviews (cloud → localStorage fallback → demo) ─
+    const fetchReviews = async () => {
+        if (useCloud()) {
+            try {
+                const cloudReviews = await fetchReviewsFromCloud();
+                if (cloudReviews.length === 0) return getDemoReviews();
+                return cloudReviews;
+            } catch (err) {
+                console.warn('Cloud fetch failed, using localStorage:', err);
             }
-        ];
+        }
+        // localStorage fallback
+        const local = JSON.parse(localStorage.getItem('portfolioReviews') || '[]');
+        return local.length > 0 ? local : getDemoReviews();
     };
 
-    // Load and Display Reviews
+    // ── Helpers ──────────────────────────────────────────────
+    const escapeHtml = (text) => {
+        const d = document.createElement('div');
+        d.textContent = text;
+        return d.innerHTML;
+    };
+
+    const formatDate = (dateStr) => {
+        const d = new Date(dateStr), now = new Date();
+        const days = Math.ceil(Math.abs(now - d) / 86400000);
+        if (days === 0) return 'Today';
+        if (days === 1) return 'Yesterday';
+        if (days < 7)  return `${days} days ago`;
+        if (days < 30) return `${Math.floor(days / 7)} weeks ago`;
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    };
+
+    // ── Render reviews ───────────────────────────────────────
     const loadReviews = async (showAll = false) => {
+        reviewsGrid.innerHTML = `
+            <div style="grid-column:1/-1; text-align:center; padding:2rem;">
+                <i class="fas fa-spinner fa-spin" style="font-size:2rem; color:var(--accent);"></i>
+                <p style="margin-top:0.75rem; color:var(--text-secondary);">Loading reviews...</p>
+            </div>`;
+
         try {
             const reviews = await fetchReviews();
-            
-            if (reviews.length === 0) {
+
+            if (!reviews.length) {
                 reviewsGrid.innerHTML = `
-                    <div class="glass-card review-card" style="text-align: center; padding: 3rem 2rem;">
-                        <i class="fas fa-comments" style="font-size: 3rem; color: var(--accent); margin-bottom: 1rem; opacity: 0.5;"></i>
-                        <p style="color: var(--text-secondary);">No reviews yet. Be the first to leave a review!</p>
-                    </div>
-                `;
+                    <div class="glass-card review-card" style="text-align:center; padding:3rem 2rem;">
+                        <i class="fas fa-comments" style="font-size:3rem; color:var(--accent); margin-bottom:1rem; opacity:0.5;"></i>
+                        <p style="color:var(--text-secondary);">No reviews yet. Be the first!</p>
+                    </div>`;
                 return;
             }
 
-            // Sort reviews by date (newest first)
             reviews.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-            // Determine how many reviews to show
-            const INITIAL_REVIEWS = 3;
-            const reviewsToShow = showAll ? reviews : reviews.slice(0, INITIAL_REVIEWS);
-            const hasMoreReviews = reviews.length > INITIAL_REVIEWS;
+            const LIMIT = 3;
+            const visible = showAll ? reviews : reviews.slice(0, LIMIT);
+            const hasMore = reviews.length > LIMIT;
+            const avatarColors = ['#3b82f6','#8b5cf6','#ec4899','#f59e0b','#10b981','#06b6d4'];
 
-            reviewsGrid.innerHTML = reviewsToShow.map((review, index) => {
-                const starsHTML = Array(5).fill(0).map((_, i) => 
-                    `<i class="fas fa-star" style="color: ${i < review.rating ? 'var(--accent)' : '#334155'}; font-size: 0.9rem;"></i>`
+            reviewsGrid.innerHTML = visible.map((review, idx) => {
+                const initials = review.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+                const color    = avatarColors[idx % avatarColors.length];
+                const starsHTML = Array(5).fill(0).map((_, i) =>
+                    `<i class="fas fa-star" style="color:${i < review.rating ? 'var(--accent)' : '#334155'}; font-size:0.9rem;"></i>`
                 ).join('');
 
-                const initials = review.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-                const avatarColors = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4'];
-                const avatarColor = avatarColors[index % avatarColors.length];
-
                 return `
-                    <div class="glass-card review-card" style="animation: navLinkFade 0.5s ease forwards ${index * 0.1}s; opacity: 0;">
+                    <div class="glass-card review-card" style="animation: fadeInUp 0.5s ease forwards ${idx * 0.1}s; opacity:0;">
                         <div class="review-header">
-                            <div class="review-avatar" style="background: ${avatarColor};">
-                                ${initials}
-                            </div>
+                            <div class="review-avatar" style="background:${color};">${initials}</div>
                             <div class="review-info">
-                                <h4 style="margin: 0; font-size: 1rem;">${escapeHtml(review.name)}</h4>
-                                ${review.role ? `<p style="margin: 0; color: var(--text-secondary); font-size: 0.85rem;">${escapeHtml(review.role)}</p>` : ''}
-                                <div class="review-stars" style="margin-top: 0.25rem;">
-                                    ${starsHTML}
-                                </div>
+                                <h4 style="margin:0; font-size:1rem;">${escapeHtml(review.name)}</h4>
+                                ${review.role ? `<p style="margin:0; color:var(--text-secondary); font-size:0.85rem;">${escapeHtml(review.role)}</p>` : ''}
+                                <div style="margin-top:0.25rem;">${starsHTML}</div>
                             </div>
                         </div>
                         <p class="review-text">${escapeHtml(review.text)}</p>
                         <p class="review-date">${formatDate(review.date)}</p>
-                    </div>
-                `;
+                    </div>`;
             }).join('');
 
-            // Add "Show All Reviews" button if there are more reviews
-            if (hasMoreReviews && !showAll) {
-                const showAllBtn = document.createElement('div');
-                showAllBtn.style.cssText = 'grid-column: 1 / -1; text-align: center; margin-top: 2rem;';
-                showAllBtn.innerHTML = `
-                    <button id="showAllReviewsBtn" class="btn btn-primary" style="border: none; min-width: 200px;">
-                        <i class="fas fa-chevron-down" style="margin-right: 0.5rem;"></i>
-                        Show All Reviews (${reviews.length})
-                    </button>
-                `;
-                reviewsGrid.appendChild(showAllBtn);
-
-                // Add click event to show all reviews
-                document.getElementById('showAllReviewsBtn').addEventListener('click', () => {
-                    loadReviews(true);
-                });
-            } else if (showAll && hasMoreReviews) {
-                // Add "Show Less" button when all reviews are displayed
-                const showLessBtn = document.createElement('div');
-                showLessBtn.style.cssText = 'grid-column: 1 / -1; text-align: center; margin-top: 2rem;';
-                showLessBtn.innerHTML = `
-                    <button id="showLessReviewsBtn" class="btn btn-outline" style="border: 2px solid var(--accent); min-width: 200px;">
-                        <i class="fas fa-chevron-up" style="margin-right: 0.5rem;"></i>
-                        Show Less
-                    </button>
-                `;
-                reviewsGrid.appendChild(showLessBtn);
-
-                // Add click event to collapse reviews
-                document.getElementById('showLessReviewsBtn').addEventListener('click', () => {
-                    loadReviews(false);
-                    // Scroll to reviews section
-                    document.getElementById('reviewsDisplay').scrollIntoView({ behavior: 'smooth', block: 'start' });
-                });
+            // Show More / Show Less button
+            if (hasMore) {
+                const btnWrap = document.createElement('div');
+                btnWrap.style.cssText = 'grid-column:1/-1; text-align:center; margin-top:2rem;';
+                if (!showAll) {
+                    btnWrap.innerHTML = `
+                        <button id="reviewToggleBtn" class="btn btn-primary" style="border:none; min-width:200px;">
+                            <i class="fas fa-chevron-down" style="margin-right:0.5rem;"></i>
+                            Show All Reviews (${reviews.length})
+                        </button>`;
+                    reviewsGrid.appendChild(btnWrap);
+                    document.getElementById('reviewToggleBtn').addEventListener('click', () => loadReviews(true));
+                } else {
+                    btnWrap.innerHTML = `
+                        <button id="reviewToggleBtn" class="btn btn-outline" style="border:2px solid var(--accent); min-width:200px;">
+                            <i class="fas fa-chevron-up" style="margin-right:0.5rem;"></i>
+                            Show Less
+                        </button>`;
+                    reviewsGrid.appendChild(btnWrap);
+                    document.getElementById('reviewToggleBtn').addEventListener('click', () => {
+                        loadReviews(false);
+                        document.getElementById('reviewsDisplay').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    });
+                }
             }
-        } catch (error) {
-            console.error('Error loading reviews:', error);
+        } catch (err) {
+            console.error('Error loading reviews:', err);
+            reviewsGrid.innerHTML = `
+                <div class="glass-card review-card" style="text-align:center; padding:2rem;">
+                    <p style="color:var(--text-secondary);">Could not load reviews. Please refresh.</p>
+                </div>`;
         }
     };
 
-    // Escape HTML to prevent XSS
-    const escapeHtml = (text) => {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    };
-
-    // Format date nicely
-    const formatDate = (dateString) => {
-        const date = new Date(dateString);
-        const now = new Date();
-        const diffTime = Math.abs(now - date);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-        if (diffDays === 0) return 'Today';
-        if (diffDays === 1) return 'Yesterday';
-        if (diffDays < 7) return `${diffDays} days ago`;
-        if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
-        
-        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    };
-
-    // Save review to cloud storage
+    // ── Save a new review ────────────────────────────────────
     const saveReview = async (review) => {
-        try {
-            // Save to localStorage as backup
-            const reviews = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            reviews.push(review);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(reviews));
+        // 1. Send email notification
+        sendEmailNotification(review).catch(err => console.warn('Email notify failed:', err));
 
-            // In a production environment, you would send to a backend here
-            // For now, reviews are stored locally but displayed with demo reviews
-            return true;
-        } catch (error) {
-            console.error('Error saving review:', error);
-            return false;
+        // 2. Save to cloud (JSONBin) or localStorage
+        if (useCloud()) {
+            try {
+                const existing = await fetchReviewsFromCloud();
+                if (existing.length === 0 || existing[0].id === 1) {
+                    // don't persist demo reviews to cloud — start fresh
+                    const only = existing.filter(r => r.id !== 1 && r.id !== 2 && r.id !== 3);
+                    await saveReviewsToCloud([...only, review]);
+                } else {
+                    await saveReviewsToCloud([...existing, review]);
+                }
+                return true;
+            } catch (err) {
+                console.warn('Cloud save failed, using localStorage:', err);
+            }
         }
+
+        // localStorage fallback
+        const local = JSON.parse(localStorage.getItem('portfolioReviews') || '[]');
+        local.push(review);
+        localStorage.setItem('portfolioReviews', JSON.stringify(local));
+        return true;
     };
 
-    // Handle Form Submission
+    // ── Form submission ──────────────────────────────────────
     reviewForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const submitBtn = reviewForm.querySelector('button[type="submit"]');
-        const originalBtnText = submitBtn.innerHTML;
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right: 0.5rem;"></i>Submitting...';
+        const submitBtn       = reviewForm.querySelector('button[type="submit"]');
+        const originalBtnHTML = submitBtn.innerHTML;
+        submitBtn.disabled    = true;
+        submitBtn.innerHTML   = '<i class="fas fa-spinner fa-spin" style="margin-right:0.5rem;"></i>Submitting...';
 
-        const name = document.getElementById('reviewerName').value.trim();
-        const role = document.getElementById('reviewerRole').value.trim();
+        const name   = document.getElementById('reviewerName').value.trim();
+        const role   = document.getElementById('reviewerRole').value.trim();
         const rating = parseInt(ratingInput.value);
-        const text = document.getElementById('reviewText').value.trim();
+        const text   = document.getElementById('reviewText').value.trim();
 
         if (!name || !text || rating < 1 || rating > 5) {
-            alert('Please fill in all required fields correctly.');
+            Toast.show('Please fill in all required fields.', 'warning');
             submitBtn.disabled = false;
-            submitBtn.innerHTML = originalBtnText;
+            submitBtn.innerHTML = originalBtnHTML;
             return;
         }
 
-        // Create review object
         const review = {
-            id: Date.now(),
-            name: name,
-            role: role,
-            rating: rating,
-            text: text,
+            id:     Date.now(),
+            name,
+            role,
+            rating,
+            text,
             date: new Date().toISOString()
         };
 
-        // Save review
-        const saved = await saveReview(review);
+        try {
+            await saveReview(review);
 
-        if (saved) {
-            // Show success message
+            // Replace form with success message
             const formCard = reviewForm.closest('.glass-card');
-            
             formCard.innerHTML = `
-                <div style="text-align: center; padding: 2rem; animation: navLinkFade 0.5s ease forwards;">
-                    <i class="fas fa-check-circle" style="font-size: 4rem; color: #10b981; margin-bottom: 1rem;"></i>
-                    <h3 style="margin-bottom: 0.5rem;">Thank You!</h3>
-                    <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Your review has been submitted successfully and is now visible to everyone!</p>
-                    <button onclick="location.reload()" class="btn btn-primary" style="border: none;">
-                        <i class="fas fa-plus" style="margin-right: 0.5rem;"></i>
-                        Add Another Review
+                <div style="text-align:center; padding:2rem; animation: fadeInUp 0.5s ease forwards;">
+                    <i class="fas fa-check-circle" style="font-size:4rem; color:#10b981; margin-bottom:1rem; display:block;"></i>
+                    <h3 style="margin-bottom:0.5rem;">Thank You, ${escapeHtml(name)}! 🎉</h3>
+                    <p style="color:var(--text-secondary); margin-bottom:1.5rem;">
+                        Your ${rating}-star review is now live for everyone to see!
+                    </p>
+                    <button onclick="location.reload()" class="btn btn-primary" style="border:none;">
+                        <i class="fas fa-plus" style="margin-right:0.5rem;"></i>Add Another Review
                     </button>
-                </div>
-            `;
+                </div>`;
 
-            // Reload reviews
+            Toast.show(`Thank you, ${name}! Your review is now live! 🌟`, 'success', 5000);
+            sendBrowserNotification('Review Submitted!', `Your ${rating}-star review is now live on Abdal's portfolio.`);
+
             await loadReviews();
-
-            // Scroll to reviews section
             setTimeout(() => {
-                document.getElementById('reviewsDisplay').scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 500);
-        } else {
-            alert('Error submitting review. Please try again.');
+                document.getElementById('reviewsDisplay')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 600);
+        } catch (err) {
+            console.error('Review save error:', err);
+            Toast.show('Error submitting review. Please try again.', 'error');
             submitBtn.disabled = false;
-            submitBtn.innerHTML = originalBtnText;
+            submitBtn.innerHTML = originalBtnHTML;
         }
     });
 
@@ -676,7 +719,6 @@ const initReviewSystem = () => {
     loadReviews();
 };
 
-// Initialize Review System
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initReviewSystem);
 } else {

@@ -554,12 +554,14 @@ This review is now live on your portfolio website.
         const starsHTML = Array(5).fill(0).map((_, i) =>
             `<i class="fas fa-star" style="color:${i < review.rating ? 'var(--accent)' : '#334155'}; font-size:0.9rem;"></i>`
         ).join('');
-        const isNew = review._isNew === true;
+        const isNew  = review._isNew === true;
+        // Use animation-delay for stagger — CSS @keyframes handles opacity:1 via 'forwards'
+        const delay  = `animation-delay: ${idx * 0.08}s`;
+        const border = isNew ? 'border-color: var(--accent); box-shadow: 0 0 0 2px rgba(56,189,248,0.3);' : '';
 
         return `
             <div class="glass-card review-card review-fade-in"
-                 style="transition: opacity 0.5s ease ${idx * 0.08}s, transform 0.5s ease ${idx * 0.08}s;
-                        ${isNew ? 'border-color: var(--accent); box-shadow: 0 0 0 2px rgba(56,189,248,0.3);' : ''}"
+                 style="${delay}; ${border}"
                  data-new="${isNew}">
                 <div class="review-header">
                     <div class="review-avatar" style="background:${color};">${initials}</div>
@@ -604,18 +606,8 @@ This review is now live on your portfolio website.
             const visible = showAll ? reviews : reviews.slice(0, LIMIT);
             const hasMore = reviews.length > LIMIT;
 
-            // Render cards (start hidden for CSS fade-in)
+            // Render cards — CSS @keyframes handles fade-in automatically
             reviewsGrid.innerHTML = visible.map((r, i) => renderCard(r, i)).join('');
-
-            // Trigger fade-in with requestAnimationFrame (reliable cross-browser)
-            requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                    reviewsGrid.querySelectorAll('.review-fade-in').forEach(el => {
-                        el.style.opacity = '1';
-                        el.style.transform = 'translateY(0)';
-                    });
-                });
-            });
 
             // Show More / Show Less button
             if (hasMore) {

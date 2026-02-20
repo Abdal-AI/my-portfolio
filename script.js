@@ -148,53 +148,58 @@ const initMain = () => {
     const navLinks = document.querySelectorAll('.nav-links li');
 
     if (burger) {
-        // Use both touchstart + click so it works on ALL devices
-        const toggleNav = (e) => {
-            e.stopPropagation();
-            const isOpen = nav.classList.toggle('nav-active');
-            burger.classList.toggle('toggle');
-            // Prevent body scroll when nav is open
-            document.body.style.overflow = isOpen ? 'hidden' : '';
-            navLinks.forEach((link, index) => {
-                link.style.animation = isOpen
-                    ? `navLinkFade 0.5s ease forwards ${index / 7 + 0.3}s`
-                    : '';
+        let navOpen = false;
+
+        const openNav = () => {
+            navOpen = true;
+            nav.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            // Trigger CSS transition after display:flex is painted
+            requestAnimationFrame(() => {
+                nav.classList.add('nav-active');
+                burger.classList.add('toggle');
+                navLinks.forEach((link, i) => {
+                    link.style.animation = `navLinkFade 0.4s ease forwards ${i * 0.07 + 0.1}s`;
+                });
             });
         };
 
-        burger.addEventListener('touchstart', toggleNav, { passive: false });
-        burger.addEventListener('click', (e) => {
-            // Only handle click if not a touch device (to avoid double-fire)
-            if (!e.sourceCapabilities || !e.sourceCapabilities.firesTouchEvents) {
-                toggleNav(e);
-            }
-        });
-
-        // Close nav when clicking/tapping outside — ONLY if nav is open
-        const closeNav = (e) => {
-            if (!nav.classList.contains('nav-active')) return;
-            if (nav.contains(e.target) || burger.contains(e.target)) return;
+        const closeNav = (target) => {
+            if (!navOpen) return;
+            // If target is inside nav or burger, don't close
+            if (target && (nav.contains(target) || burger.contains(target))) return;
+            navOpen = false;
             nav.classList.remove('nav-active');
             burger.classList.remove('toggle');
             document.body.style.overflow = '';
             navLinks.forEach(li => li.style.animation = '');
+            // Hide completely after transition
+            setTimeout(() => {
+                if (!navOpen) nav.style.display = '';
+            }, 380);
         };
-        document.addEventListener('touchstart', closeNav, { passive: true });
-        document.addEventListener('click', closeNav);
 
-        // Close nav instantly when a nav link is tapped
+        const toggleNav = (e) => {
+            e.stopPropagation();
+            if (navOpen) closeNav(null);
+            else openNav();
+        };
+
+        // Touch + click on burger (touchstart for zero delay on mobile)
+        burger.addEventListener('touchstart', (e) => { e.preventDefault(); toggleNav(e); }, { passive: false });
+        burger.addEventListener('click', toggleNav);
+
+        // Close when tapping/clicking outside nav
+        const handleOutside = (e) => closeNav(e.target);
+        document.addEventListener('touchstart', handleOutside, { passive: true });
+        document.addEventListener('click', handleOutside);
+
+        // Close instantly on nav link tap
         navLinks.forEach(li => {
-            const link = li.querySelector('a');
-            if (link) {
-                const close = () => {
-                    nav.classList.remove('nav-active');
-                    burger.classList.remove('toggle');
-                    document.body.style.overflow = '';
-                    navLinks.forEach(l => l.style.animation = '');
-                };
-                link.addEventListener('touchstart', close, { passive: true });
-                link.addEventListener('click', close);
-            }
+            const a = li.querySelector('a');
+            if (!a) return;
+            a.addEventListener('touchstart', () => closeNav(null), { passive: true });
+            a.addEventListener('click', () => closeNav(null));
         });
     }
 };

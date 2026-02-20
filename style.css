@@ -226,9 +226,9 @@ section {
     appearance: none;
 }
 
-/* Icons/text inside buttons should not capture events separately */
+/* Icons/text inside buttons should inherit pointer events from parent */
 .btn > * {
-    pointer-events: none;
+    pointer-events: inherit;
 }
 
 .btn-primary {
@@ -340,60 +340,56 @@ nav {
     transform: rotate(45deg) translate(-5px, -6px);
 }
 
-/* Mobile Nav Links */
+/* Mobile Nav Links — use display:none when closed for 100% reliable touch passthrough */
 .nav-links {
-    display: flex;
+    display: none;              /* CLOSED: completely removed from touch/hit-testing */
     position: fixed;
     right: 0;
+    top: 0;
     height: 100vh;
     height: 100dvh;
-    top: 0;
     background-color: #020617;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     width: 100%;
-    transform: translateX(100%);
-    transition: transform 0.4s cubic-bezier(0.77, 0, 0.175, 1), visibility 0.4s, opacity 0.4s;
     z-index: 1100;
     padding: 0;
     list-style: none;
-    pointer-events: none;
-    visibility: hidden;
     opacity: 0;
+    transform: translateX(100%);
+    transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.77,0,0.175,1);
 }
 
+/* OPEN: visible and interactive */
 .nav-links.nav-active {
-    transform: translateX(0%);
-    pointer-events: auto;
-    visibility: visible;
+    display: flex;
     opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
 }
 
 .nav-links li {
     margin: 1.5rem 0;
-    opacity: 1;
     width: 100%;
     text-align: center;
-    pointer-events: auto;
 }
 
 .nav-links a {
     font-weight: 700;
     color: #ffffff !important;
     font-size: 1.8rem;
-    /* No z-index — nav is already on top via parent */
     padding: 1.5rem 2rem;
     display: block;
     width: 100%;
-    transition: color 0.3s ease, background 0.3s ease;
+    transition: color 0.3s ease, background 0.2s ease;
     cursor: pointer;
     text-align: center;
     touch-action: manipulation;
-    pointer-events: auto;
-    -webkit-tap-highlight-color: rgba(56, 189, 248, 0.25);
+    -webkit-tap-highlight-color: rgba(56, 189, 248, 0.3);
 }
 
+.nav-links a:active,
 .nav-links a:hover,
 .nav-links a.active {
     color: var(--accent) !important;

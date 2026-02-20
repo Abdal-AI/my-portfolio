@@ -20,7 +20,7 @@
             color: #f8fafc;
             min-height: 100vh;
             width: 100%;
-            overflow-x: hidden;
+            overflow-x: clip;  /* 'hidden' blocks iOS touch events — use clip instead */
             font-size: 1.1rem;
             line-height: 1.7;
         }
@@ -105,15 +105,24 @@
             border: 1px solid var(--glass-border);
             border-radius: 12px;
             margin-bottom: 1.25rem;
-            transition: all 0.3s ease;
-            min-height: 60px;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+            min-height: 64px;
             text-decoration: none;
             color: inherit;
+            /* ── Mobile touch fixes ── */
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: rgba(56, 189, 248, 0.2);
+            cursor: pointer;
+            pointer-events: auto;
+            position: static;   /* never position:relative — breaks stacking on mobile */
+            -webkit-user-select: none;
+            user-select: none;
         }
 
-        .social-link:hover {
+        .social-link:hover,
+        .social-link:active {
             background: rgba(255, 255, 255, 0.1);
-            transform: translateY(-3px);
+            transform: translateY(-2px);
             border-color: var(--accent);
         }
 
@@ -192,15 +201,15 @@
                         </a>
                     </div>
 
-                    <div style="font-size: 1.5rem;">
+                    <div style="font-size: 1.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
                         <a href="https://www.linkedin.com/in/muhammad-abdal-619451299/" target="_blank"
-                            style="margin-right: 1.5rem; color: var(--text-secondary);"><i
+                            style="display:inline-flex; align-items:center; justify-content:center; width:48px; height:48px; border-radius:50%; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:var(--text-secondary); touch-action:manipulation; -webkit-tap-highlight-color:rgba(56,189,248,0.2); cursor:pointer;"><i
                                 class="fab fa-linkedin"></i></a>
                         <a href="https://x.com/abdalkhan1514" target="_blank"
-                            style="margin-right: 1.5rem; color: var(--text-secondary);"><i
+                            style="display:inline-flex; align-items:center; justify-content:center; width:48px; height:48px; border-radius:50%; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:var(--text-secondary); touch-action:manipulation; -webkit-tap-highlight-color:rgba(56,189,248,0.2); cursor:pointer;"><i
                                 class="fab fa-twitter"></i></a>
                         <a href="https://www.kaggle.com/muhammadabdal123" target="_blank"
-                            style="margin-right: 1.5rem; color: var(--text-secondary);"><i
+                            style="display:inline-flex; align-items:center; justify-content:center; width:48px; height:48px; border-radius:50%; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:var(--text-secondary); touch-action:manipulation; -webkit-tap-highlight-color:rgba(56,189,248,0.2); cursor:pointer;"><i
                                 class="fab fa-kaggle"></i></a>
                     </div>
                 </div>

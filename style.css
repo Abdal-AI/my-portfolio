@@ -1550,21 +1550,15 @@ select:focus-visible,
     grid-column: 1 / -1;
 }
 
-/* Animation for new reviews */
-@keyframes slideInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+/* Reliable fade-in for dynamically rendered review cards */
+/* JS sets opacity/transform to 1/0 via requestAnimationFrame after insert */
+.review-fade-in {
+    opacity: 0;
+    transform: translateY(18px);
+    /* transition is set inline per-card with staggered delay */
 }
 
-.review-card {
-    animation: slideInUp 0.4s ease-out;
-}
+
 
 /* Hover effect for review cards */
 .review-card:hover {

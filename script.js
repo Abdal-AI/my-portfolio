@@ -508,20 +508,25 @@ This review is now live on your portfolio website.
         }
     ];
 
-    // ── Fetch reviews (cloud → localStorage fallback → demo) ─
+    // ── Fetch reviews: ALWAYS combines real reviews + demo reviews ─
+    const STORAGE_KEY = 'portfolioReviews_real'; // separate key so we never mix with old data
+
     const fetchReviews = async () => {
+        const demos = getDemoReviews();
+
         if (useCloud()) {
             try {
                 const cloudReviews = await fetchReviewsFromCloud();
-                if (cloudReviews.length === 0) return getDemoReviews();
-                return cloudReviews;
+                // Combine: real cloud reviews (newest first) + demo reviews
+                return [...cloudReviews, ...demos];
             } catch (err) {
-                console.warn('Cloud fetch failed, using localStorage:', err);
+                console.warn('Cloud fetch failed, falling back to localStorage:', err);
             }
         }
-        // localStorage fallback
-        const local = JSON.parse(localStorage.getItem('portfolioReviews') || '[]');
-        return local.length > 0 ? local : getDemoReviews();
+
+        // localStorage: combine real reviews + demo reviews
+        const local = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        return [...local, ...demos];
     };
 
     // ── Helpers ──────────────────────────────────────────────
@@ -542,7 +547,38 @@ This review is now live on your portfolio website.
     };
 
     // ── Render reviews ───────────────────────────────────────
+    const renderCard = (review, idx) => {
+        const avatarColors = ['#3b82f6','#8b5cf6','#ec4899','#f59e0b','#10b981','#06b6d4'];
+        const initials  = review.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+        const color     = avatarColors[idx % avatarColors.length];
+        const starsHTML = Array(5).fill(0).map((_, i) =>
+            `<i class="fas fa-star" style="color:${i < review.rating ? 'var(--accent)' : '#334155'}; font-size:0.9rem;"></i>`
+        ).join('');
+        const isNew = review._isNew === true;
+
+        return `
+            <div class="glass-card review-card review-fade-in"
+                 style="transition: opacity 0.5s ease ${idx * 0.08}s, transform 0.5s ease ${idx * 0.08}s;
+                        ${isNew ? 'border-color: var(--accent); box-shadow: 0 0 0 2px rgba(56,189,248,0.3);' : ''}"
+                 data-new="${isNew}">
+                <div class="review-header">
+                    <div class="review-avatar" style="background:${color};">${initials}</div>
+                    <div class="review-info">
+                        <h4 style="margin:0; font-size:1rem;">
+                            ${escapeHtml(review.name)}
+                            ${isNew ? '<span style="background:var(--accent);color:#0f172a;font-size:0.65rem;padding:0.15rem 0.5rem;border-radius:20px;margin-left:0.5rem;font-weight:700;vertical-align:middle;">NEW</span>' : ''}
+                        </h4>
+                        ${review.role ? `<p style="margin:0; color:var(--text-secondary); font-size:0.85rem;">${escapeHtml(review.role)}</p>` : ''}
+                        <div style="margin-top:0.25rem;">${starsHTML}</div>
+                    </div>
+                </div>
+                <p class="review-text">${escapeHtml(review.text)}</p>
+                <p class="review-date">${formatDate(review.date)}</p>
+            </div>`;
+    };
+
     const loadReviews = async (showAll = false) => {
+        // Show spinner
         reviewsGrid.innerHTML = `
             <div style="grid-column:1/-1; text-align:center; padding:2rem;">
                 <i class="fas fa-spinner fa-spin" style="font-size:2rem; color:var(--accent);"></i>
@@ -554,41 +590,32 @@ This review is now live on your portfolio website.
 
             if (!reviews.length) {
                 reviewsGrid.innerHTML = `
-                    <div class="glass-card review-card" style="text-align:center; padding:3rem 2rem;">
+                    <div class="glass-card review-card" style="grid-column:1/-1; text-align:center; padding:3rem 2rem;">
                         <i class="fas fa-comments" style="font-size:3rem; color:var(--accent); margin-bottom:1rem; opacity:0.5;"></i>
                         <p style="color:var(--text-secondary);">No reviews yet. Be the first!</p>
                     </div>`;
                 return;
             }
 
+            // Sort newest first
             reviews.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-            const LIMIT = 3;
+            const LIMIT   = 3;
             const visible = showAll ? reviews : reviews.slice(0, LIMIT);
             const hasMore = reviews.length > LIMIT;
-            const avatarColors = ['#3b82f6','#8b5cf6','#ec4899','#f59e0b','#10b981','#06b6d4'];
 
-            reviewsGrid.innerHTML = visible.map((review, idx) => {
-                const initials = review.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-                const color    = avatarColors[idx % avatarColors.length];
-                const starsHTML = Array(5).fill(0).map((_, i) =>
-                    `<i class="fas fa-star" style="color:${i < review.rating ? 'var(--accent)' : '#334155'}; font-size:0.9rem;"></i>`
-                ).join('');
+            // Render cards (start hidden for CSS fade-in)
+            reviewsGrid.innerHTML = visible.map((r, i) => renderCard(r, i)).join('');
 
-                return `
-                    <div class="glass-card review-card" style="animation: fadeInUp 0.5s ease forwards ${idx * 0.1}s; opacity:0;">
-                        <div class="review-header">
-                            <div class="review-avatar" style="background:${color};">${initials}</div>
-                            <div class="review-info">
-                                <h4 style="margin:0; font-size:1rem;">${escapeHtml(review.name)}</h4>
-                                ${review.role ? `<p style="margin:0; color:var(--text-secondary); font-size:0.85rem;">${escapeHtml(review.role)}</p>` : ''}
-                                <div style="margin-top:0.25rem;">${starsHTML}</div>
-                            </div>
-                        </div>
-                        <p class="review-text">${escapeHtml(review.text)}</p>
-                        <p class="review-date">${formatDate(review.date)}</p>
-                    </div>`;
-            }).join('');
+            // Trigger fade-in with requestAnimationFrame (reliable cross-browser)
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    reviewsGrid.querySelectorAll('.review-fade-in').forEach(el => {
+                        el.style.opacity = '1';
+                        el.style.transform = 'translateY(0)';
+                    });
+                });
+            });
 
             // Show More / Show Less button
             if (hasMore) {
@@ -626,30 +653,25 @@ This review is now live on your portfolio website.
 
     // ── Save a new review ────────────────────────────────────
     const saveReview = async (review) => {
-        // 1. Send email notification
+        // 1. Fire email notification (non-blocking)
         sendEmailNotification(review).catch(err => console.warn('Email notify failed:', err));
 
-        // 2. Save to cloud (JSONBin) or localStorage
+        // 2. Save to cloud (JSONBin) if configured
         if (useCloud()) {
             try {
                 const existing = await fetchReviewsFromCloud();
-                if (existing.length === 0 || existing[0].id === 1) {
-                    // don't persist demo reviews to cloud — start fresh
-                    const only = existing.filter(r => r.id !== 1 && r.id !== 2 && r.id !== 3);
-                    await saveReviewsToCloud([...only, review]);
-                } else {
-                    await saveReviewsToCloud([...existing, review]);
-                }
+                // Just append — demo reviews are never stored in cloud
+                await saveReviewsToCloud([...existing, review]);
                 return true;
             } catch (err) {
-                console.warn('Cloud save failed, using localStorage:', err);
+                console.warn('Cloud save failed, saving locally instead:', err);
             }
         }
 
-        // localStorage fallback
-        const local = JSON.parse(localStorage.getItem('portfolioReviews') || '[]');
+        // 3. localStorage fallback — save ONLY real reviews (demos are always added dynamically)
+        const local = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
         local.push(review);
-        localStorage.setItem('portfolioReviews', JSON.stringify(local));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(local));
         return true;
     };
 
@@ -684,29 +706,34 @@ This review is now live on your portfolio website.
         };
 
         try {
+            // Mark as new so it shows a "NEW" badge
+            review._isNew = true;
             await saveReview(review);
 
-            // Replace form with success message
+            // Replace form with success card
             const formCard = reviewForm.closest('.glass-card');
             formCard.innerHTML = `
-                <div style="text-align:center; padding:2rem; animation: fadeInUp 0.5s ease forwards;">
+                <div style="text-align:center; padding:2rem;">
                     <i class="fas fa-check-circle" style="font-size:4rem; color:#10b981; margin-bottom:1rem; display:block;"></i>
                     <h3 style="margin-bottom:0.5rem;">Thank You, ${escapeHtml(name)}! 🎉</h3>
                     <p style="color:var(--text-secondary); margin-bottom:1.5rem;">
-                        Your ${rating}-star review is now live for everyone to see!
+                        Your ${rating}-star review is now shown in <strong>What Clients Say</strong> below!
                     </p>
                     <button onclick="location.reload()" class="btn btn-primary" style="border:none;">
                         <i class="fas fa-plus" style="margin-right:0.5rem;"></i>Add Another Review
                     </button>
                 </div>`;
 
-            Toast.show(`Thank you, ${name}! Your review is now live! 🌟`, 'success', 5000);
-            sendBrowserNotification('Review Submitted!', `Your ${rating}-star review is now live on Abdal's portfolio.`);
+            Toast.show(`Thank you, ${name}! Your review is live below! 🌟`, 'success', 5000);
+            sendBrowserNotification('Review Submitted!', `Your ${rating}-star review is now live!`);
 
+            // Reload the reviews grid — review will appear at top with NEW badge
             await loadReviews();
+
+            // Scroll smoothly to the reviews section
             setTimeout(() => {
                 document.getElementById('reviewsDisplay')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 600);
+            }, 400);
         } catch (err) {
             console.error('Review save error:', err);
             Toast.show('Error submitting review. Please try again.', 'error');
@@ -723,4 +750,43 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initReviewSystem);
 } else {
     initReviewSystem();
+}
+
+// ============================================================
+// PAYMENT — Copy-to-Clipboard for EasyPaisa / UBL Account Numbers
+// ============================================================
+function copyToClipboard(text, textElId, iconElId) {
+    // Fallback for older mobile browsers
+    const fallback = () => {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.cssText = 'position:fixed;left:-9999px;top:-9999px;opacity:0;';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        try { document.execCommand('copy'); } catch(e) {}
+        document.body.removeChild(ta);
+    };
+
+    const done = () => {
+        // Update icon to checkmark
+        const icon = document.getElementById(iconElId);
+        if (icon) {
+            icon.className = 'fas fa-check';
+            icon.style.color = '#22c55e';
+            setTimeout(() => {
+                icon.className = 'fas fa-copy';
+                icon.style.color = '';
+            }, 2000);
+        }
+        Toast.show('✅ Copied to clipboard!', 'success', 2500);
+    };
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(fallback);
+        done();
+    } else {
+        fallback();
+        done();
+    }
 }

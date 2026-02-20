@@ -58,6 +58,7 @@
                 <ul class="nav-links">
                     <li><a href="index.html">Home</a></li>
                     <li><a href="services.html" class="active">Services</a></li>
+                    <li><a href="services.html#pay-now" style="color:var(--accent)!important;">💳 Pay Now</a></li>
                     <li><a href="portfolio.html">Portfolio</a></li>
                     <li><a href="contact.html">Contact</a></li>
                 </ul>
@@ -226,6 +227,158 @@
                         </ul>
                         <a href="contact.html" class="btn btn-outline" style="margin-top: auto;">Order Now</a>
                     </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================
+         PAYMENT SECTION
+         =========================== -->
+    <section class="section-padding" id="pay-now" style="background: rgba(255,255,255,0.015);">
+        <div class="container">
+            <div style="text-align:center; margin-bottom:3.5rem;">
+                <span style="display:inline-block; background:rgba(56,189,248,0.12); color:var(--accent); font-size:0.8rem; font-weight:700; letter-spacing:3px; text-transform:uppercase; padding:0.4rem 1.2rem; border-radius:50px; margin-bottom:1rem;">Secure Payments</span>
+                <h2 style="margin-bottom:1rem;">Pay Online Easily 💳</h2>
+                <p style="max-width:580px; margin:0 auto; color:var(--text-secondary);">
+                    After discussing your project, send payment securely via EasyPaisa or UBL Bank.
+                    Work starts immediately once payment is confirmed.
+                </p>
+            </div>
+
+            <!-- Payment Cards Grid -->
+            <div style="display:grid; grid-template-columns:1fr; gap:2rem; max-width:900px; margin:0 auto 4rem;">
+
+                <!-- EasyPaisa Card -->
+                <div class="glass-card pay-card" id="ep-card" style="padding:2.5rem; border-color:rgba(34,197,94,0.35); position:relative; overflow:hidden;">
+                    <div style="position:absolute; top:0; left:0; right:0; height:4px; background:linear-gradient(90deg,#22c55e,#4ade80);"></div>
+                    <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1.75rem; flex-wrap:wrap;">
+                        <div style="width:60px; height:60px; border-radius:16px; background:linear-gradient(135deg,#22c55e,#16a34a); display:flex; align-items:center; justify-content:center; font-size:1.8rem; box-shadow:0 0 20px rgba(34,197,94,0.4); flex-shrink:0;">
+                            📱
+                        </div>
+                        <div>
+                            <h3 style="margin:0; color:#4ade80; font-size:1.4rem;">EasyPaisa</h3>
+                            <p style="margin:0; font-size:0.85rem; color:var(--text-secondary);">Mobile Wallet — Instant Transfer</p>
+                        </div>
+                        <span style="margin-left:auto; background:rgba(34,197,94,0.15); color:#4ade80; font-size:0.75rem; font-weight:700; padding:0.25rem 0.85rem; border-radius:50px; white-space:nowrap; border:1px solid rgba(34,197,94,0.3);">✓ Recommended</span>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.5rem; flex-wrap:wrap;">
+                        <div style="background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.2); border-radius:12px; padding:1rem;">
+                            <p style="margin:0 0 0.25rem; font-size:0.75rem; color:var(--text-secondary); text-transform:uppercase; letter-spacing:1px;">Account Name</p>
+                            <p style="margin:0; font-weight:700; font-size:1rem; color:#f8fafc;">Muhammad Abdal</p>
+                        </div>
+                        <div style="background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.2); border-radius:12px; padding:1rem; cursor:pointer;" onclick="copyToClipboard('03XXXXXXXXX','ep-num-text','ep-copy-icon')" title="Tap to copy">
+                            <p style="margin:0 0 0.25rem; font-size:0.75rem; color:var(--text-secondary); text-transform:uppercase; letter-spacing:1px;">Mobile Number</p>
+                            <p style="margin:0; font-weight:700; font-size:1rem; color:#4ade80; font-family:monospace;" id="ep-num-text">03XX-XXXXXXX</p>
+                        </div>
+                    </div>
+
+                    <button onclick="copyToClipboard('03XXXXXXXXX','ep-num-text','ep-copy-icon')" class="pay-copy-btn" style="width:100%; padding:0.85rem; background:rgba(34,197,94,0.15); border:1px solid rgba(34,197,94,0.35); border-radius:10px; color:#4ade80; font-weight:600; font-size:0.95rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:0.6rem; touch-action:manipulation; transition:all 0.2s ease;">
+                        <i class="fas fa-copy" id="ep-copy-icon"></i>
+                        <span>Copy EasyPaisa Number</span>
+                    </button>
+
+                    <p style="margin:1rem 0 0; font-size:0.8rem; color:var(--text-secondary); text-align:center;">
+                        <i class="fas fa-info-circle" style="margin-right:0.3rem;"></i>
+                        Open EasyPaisa app → Send Money → Enter number above
+                    </p>
+                </div>
+
+                <!-- UBL Bank Card -->
+                <div class="glass-card pay-card" id="ubl-card" style="padding:2.5rem; border-color:rgba(139,92,246,0.35); position:relative; overflow:hidden;">
+                    <div style="position:absolute; top:0; left:0; right:0; height:4px; background:linear-gradient(90deg,#8b5cf6,#a78bfa);"></div>
+                    <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1.75rem; flex-wrap:wrap;">
+                        <div style="width:60px; height:60px; border-radius:16px; background:linear-gradient(135deg,#8b5cf6,#6d28d9); display:flex; align-items:center; justify-content:center; font-size:1.8rem; box-shadow:0 0 20px rgba(139,92,246,0.4); flex-shrink:0;">
+                            🏦
+                        </div>
+                        <div>
+                            <h3 style="margin:0; color:#a78bfa; font-size:1.4rem;">UBL Bank</h3>
+                            <p style="margin:0; font-size:0.85rem; color:var(--text-secondary);">Bank Transfer / IBFT</p>
+                        </div>
+                        <span style="margin-left:auto; background:rgba(139,92,246,0.15); color:#a78bfa; font-size:0.75rem; font-weight:700; padding:0.25rem 0.85rem; border-radius:50px; white-space:nowrap; border:1px solid rgba(139,92,246,0.3);">All Banks</span>
+                    </div>
+
+                    <div style="display:grid; gap:0.85rem; margin-bottom:1.5rem;">
+                        <div style="background:rgba(139,92,246,0.08); border:1px solid rgba(139,92,246,0.2); border-radius:12px; padding:1rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+                            <div>
+                                <p style="margin:0 0 0.15rem; font-size:0.75rem; color:var(--text-secondary); text-transform:uppercase; letter-spacing:1px;">Account Title</p>
+                                <p style="margin:0; font-weight:700; font-size:1rem;">Muhammad Abdal</p>
+                            </div>
+                        </div>
+                        <div style="background:rgba(139,92,246,0.08); border:1px solid rgba(139,92,246,0.2); border-radius:12px; padding:1rem; cursor:pointer; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;" onclick="copyToClipboard('XXXX-XXXX-XXXX-XXXX','ubl-acc-text','ubl-copy-icon1')" title="Tap to copy">
+                            <div>
+                                <p style="margin:0 0 0.15rem; font-size:0.75rem; color:var(--text-secondary); text-transform:uppercase; letter-spacing:1px;">Account Number</p>
+                                <p style="margin:0; font-weight:700; font-size:1rem; color:#a78bfa; font-family:monospace;" id="ubl-acc-text">XXXX-XXXX-XXXX-XXXX</p>
+                            </div>
+                            <i class="fas fa-copy" id="ubl-copy-icon1" style="color:var(--text-secondary); font-size:1rem;"></i>
+                        </div>
+                        <div style="background:rgba(139,92,246,0.08); border:1px solid rgba(139,92,246,0.2); border-radius:12px; padding:1rem; cursor:pointer; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;" onclick="copyToClipboard('PK00UNIXXXXXXXXXXXXXX','ubl-iban-text','ubl-copy-icon2')" title="Tap to copy">
+                            <div>
+                                <p style="margin:0 0 0.15rem; font-size:0.75rem; color:var(--text-secondary); text-transform:uppercase; letter-spacing:1px;">IBAN</p>
+                                <p style="margin:0; font-weight:700; font-size:0.9rem; color:#a78bfa; font-family:monospace; word-break:break-all;" id="ubl-iban-text">PK00 UNIB XXXX XXXX XXXX XX</p>
+                            </div>
+                            <i class="fas fa-copy" id="ubl-copy-icon2" style="color:var(--text-secondary); font-size:1rem; flex-shrink:0;"></i>
+                        </div>
+                        <div style="background:rgba(139,92,246,0.08); border:1px solid rgba(139,92,246,0.2); border-radius:12px; padding:1rem;">
+                            <p style="margin:0 0 0.15rem; font-size:0.75rem; color:var(--text-secondary); text-transform:uppercase; letter-spacing:1px;">Bank</p>
+                            <p style="margin:0; font-weight:700; font-size:1rem;">United Bank Limited (UBL)</p>
+                        </div>
+                    </div>
+
+                    <p style="margin:0; font-size:0.8rem; color:var(--text-secondary); text-align:center;">
+                        <i class="fas fa-info-circle" style="margin-right:0.3rem;"></i>
+                        Use any bank app / UBL Digital app → IBFT → Enter IBAN above
+                    </p>
+                </div>
+            </div>
+
+            <!-- How to Pay Steps -->
+            <div style="max-width:900px; margin:0 auto;">
+                <h3 style="text-align:center; margin-bottom:2rem;">
+                    <i class="fas fa-route" style="color:var(--accent); margin-right:0.6rem;"></i>
+                    How It Works
+                </h3>
+                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1.5rem;">
+                    <div class="glass-card" style="text-align:center; padding:1.75rem 1.25rem;">
+                        <div style="width:52px; height:52px; border-radius:50%; background:rgba(56,189,248,0.15); border:2px solid var(--accent); display:flex; align-items:center; justify-content:center; margin:0 auto 1rem; font-weight:800; font-size:1.2rem; color:var(--accent);">1</div>
+                        <p style="margin:0; font-size:0.9rem; color:var(--text-secondary);">📩 <strong style="color:#f8fafc;">Contact me</strong><br>Discuss your project & agree on price</p>
+                    </div>
+                    <div class="glass-card" style="text-align:center; padding:1.75rem 1.25rem;">
+                        <div style="width:52px; height:52px; border-radius:50%; background:rgba(56,189,248,0.15); border:2px solid var(--accent); display:flex; align-items:center; justify-content:center; margin:0 auto 1rem; font-weight:800; font-size:1.2rem; color:var(--accent);">2</div>
+                        <p style="margin:0; font-size:0.9rem; color:var(--text-secondary);">💳 <strong style="color:#f8fafc;">Send payment</strong><br>Via EasyPaisa or UBL Bank above</p>
+                    </div>
+                    <div class="glass-card" style="text-align:center; padding:1.75rem 1.25rem;">
+                        <div style="width:52px; height:52px; border-radius:50%; background:rgba(56,189,248,0.15); border:2px solid var(--accent); display:flex; align-items:center; justify-content:center; margin:0 auto 1rem; font-weight:800; font-size:1.2rem; color:var(--accent);">3</div>
+                        <p style="margin:0; font-size:0.9rem; color:var(--text-secondary);">📸 <strong style="color:#f8fafc;">Send screenshot</strong><br>Share payment proof via WhatsApp/email</p>
+                    </div>
+                    <div class="glass-card" style="text-align:center; padding:1.75rem 1.25rem;">
+                        <div style="width:52px; height:52px; border-radius:50%; background:rgba(56,189,248,0.15); border:2px solid var(--accent); display:flex; align-items:center; justify-content:center; margin:0 auto 1rem; font-weight:800; font-size:1.2rem; color:var(--accent);">4</div>
+                        <p style="margin:0; font-size:0.9rem; color:var(--text-secondary);">🚀 <strong style="color:#f8fafc;">Work begins!</strong><br>Project starts within 24 hours</p>
+                    </div>
+                </div>
+
+                <!-- Notice box -->
+                <div style="margin-top:2.5rem; background:rgba(56,189,248,0.07); border:1px solid rgba(56,189,248,0.25); border-radius:14px; padding:1.25rem 1.5rem; display:flex; gap:1rem; align-items:flex-start; flex-wrap:wrap;">
+                    <i class="fas fa-shield-alt" style="color:var(--accent); font-size:1.4rem; flex-shrink:0; margin-top:0.15rem;"></i>
+                    <div>
+                        <strong style="color:var(--accent); display:block; margin-bottom:0.25rem;">100% Secure & Verified</strong>
+                        <p style="margin:0; font-size:0.875rem; color:var(--text-secondary);">
+                            All payment accounts are verified. Always send a payment screenshot to
+                            <strong style="color:#f8fafc;">muhammadabdal15140@gmail.com</strong>
+                            or WhatsApp after transferring. A receipt/confirmation will be sent back to you within 1 hour.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- CTA -->
+                <div style="text-align:center; margin-top:2.5rem;">
+                    <a href="contact.html" class="btn btn-primary" style="margin-right:1rem; margin-bottom:0.75rem;">
+                        <i class="fas fa-comments" style="margin-right:0.5rem;"></i>Discuss My Project First
+                    </a>
+                    <a href="https://wa.me/92XXXXXXXXXX?text=Hi%20Abdal!%20I%20have%20made%20the%20payment%20and%20want%20to%20share%20the%20screenshot." target="_blank" class="btn btn-outline" style="margin-bottom:0.75rem;">
+                        <i class="fab fa-whatsapp" style="margin-right:0.5rem;"></i>Send Payment Proof
+                    </a>
                 </div>
             </div>
         </div>

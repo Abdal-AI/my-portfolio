@@ -34,7 +34,7 @@ body {
     color: var(--text-primary);
     line-height: 1.7;
     font-size: 1.0625rem; /* 17px base */
-    /* NOTE: overflow-x:hidden on body blocks iOS touch events — use max-width+clip instead */
+    /* NOTE: overflow-x:hidden on body blocks iOS touch events — use clip instead */
     overflow-x: clip;
     background-image:
         radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.1) 0%, transparent 40%),
@@ -42,6 +42,39 @@ body {
     min-height: 100vh;
     /* iOS momentum scrolling */
     -webkit-overflow-scrolling: touch;
+}
+
+/* ==========================================
+   GLOBAL MOBILE TOUCH FIX
+   Ensures ALL interactive elements respond
+   to touch on iOS Safari & Android Chrome
+   ========================================== */
+a,
+button,
+input,
+textarea,
+select,
+label,
+[role="button"],
+[onclick] {
+    touch-action: manipulation;   /* prevents 300ms click delay */
+    pointer-events: auto;         /* never let a parent block touches */
+    -webkit-tap-highlight-color: rgba(56, 189, 248, 0.15);
+}
+
+/* Inputs & textareas must be at least 16px to prevent iOS auto-zoom */
+input,
+textarea,
+select {
+    font-size: max(16px, 1rem) !important;
+}
+
+/* Anchors must never create accidental stacking contexts */
+a {
+    position: static;
+}
+a[href] {
+    cursor: pointer;
 }
 
 /* ==========================================

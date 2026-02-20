@@ -148,33 +148,52 @@ const initMain = () => {
     const navLinks = document.querySelectorAll('.nav-links li');
 
     if (burger) {
-        burger.addEventListener('click', (e) => {
+        // Use both touchstart + click so it works on ALL devices
+        const toggleNav = (e) => {
             e.stopPropagation();
-            nav.classList.toggle('nav-active');
+            const isOpen = nav.classList.toggle('nav-active');
             burger.classList.toggle('toggle');
+            // Prevent body scroll when nav is open
+            document.body.style.overflow = isOpen ? 'hidden' : '';
             navLinks.forEach((link, index) => {
-                link.style.animation = link.style.animation
-                    ? ''
-                    : `navLinkFade 0.5s ease forwards ${index / 7 + 0.3}s`;
+                link.style.animation = isOpen
+                    ? `navLinkFade 0.5s ease forwards ${index / 7 + 0.3}s`
+                    : '';
             });
-        });
+        };
 
-        document.addEventListener('click', (e) => {
-            if (nav.classList.contains('nav-active') && !nav.contains(e.target) && !burger.contains(e.target)) {
-                nav.classList.remove('nav-active');
-                burger.classList.remove('toggle');
-                navLinks.forEach(li => li.style.animation = '');
+        burger.addEventListener('touchstart', toggleNav, { passive: false });
+        burger.addEventListener('click', (e) => {
+            // Only handle click if not a touch device (to avoid double-fire)
+            if (!e.sourceCapabilities || !e.sourceCapabilities.firesTouchEvents) {
+                toggleNav(e);
             }
         });
 
+        // Close nav when clicking/tapping outside — ONLY if nav is open
+        const closeNav = (e) => {
+            if (!nav.classList.contains('nav-active')) return;
+            if (nav.contains(e.target) || burger.contains(e.target)) return;
+            nav.classList.remove('nav-active');
+            burger.classList.remove('toggle');
+            document.body.style.overflow = '';
+            navLinks.forEach(li => li.style.animation = '');
+        };
+        document.addEventListener('touchstart', closeNav, { passive: true });
+        document.addEventListener('click', closeNav);
+
+        // Close nav instantly when a nav link is tapped
         navLinks.forEach(li => {
             const link = li.querySelector('a');
             if (link) {
-                link.addEventListener('click', () => {
+                const close = () => {
                     nav.classList.remove('nav-active');
                     burger.classList.remove('toggle');
+                    document.body.style.overflow = '';
                     navLinks.forEach(l => l.style.animation = '');
-                });
+                };
+                link.addEventListener('touchstart', close, { passive: true });
+                link.addEventListener('click', close);
             }
         });
     }

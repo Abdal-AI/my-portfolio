@@ -69,10 +69,7 @@ select {
     font-size: max(16px, 1rem) !important;
 }
 
-/* Anchors must never create accidental stacking contexts */
-a {
-    position: static;
-}
+/* Anchors: always show pointer cursor and respond to touch */
 a[href] {
     cursor: pointer;
 }
@@ -1530,12 +1527,17 @@ select:focus-visible,
     font-size: 1.75rem;
     margin-top: 0.5rem;
     cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(56, 189, 248, 0.2);
 }
 
 .star-rating i {
     color: #334155;
     transition: all 0.2s ease;
     cursor: pointer;
+    touch-action: manipulation;
+    pointer-events: auto;
+    padding: 0.25rem; /* bigger tap target */
 }
 
 .star-rating i:hover,
@@ -1657,9 +1659,11 @@ select:focus-visible,
 
 
 
-/* Hover effect for review cards */
-.review-card:hover {
-    transform: translateY(-4px);
+/* Hover effect for review cards — ONLY on non-touch devices */
+@media (hover: hover) and (pointer: fine) {
+    .review-card:hover {
+        transform: translateY(-4px);
+    }
 }
 
 /* Success Message Animation */

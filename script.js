@@ -149,12 +149,12 @@ const initMain = () => {
 
     if (burger) {
         let navOpen = false;
+        let burgerTouchActive = false; // prevents doc touchstart from firing simultaneously
 
         const openNav = () => {
             navOpen = true;
             nav.style.display = 'flex';
             document.body.style.overflow = 'hidden';
-            // Trigger CSS transition after display:flex is painted
             requestAnimationFrame(() => {
                 nav.classList.add('nav-active');
                 burger.classList.add('toggle');
@@ -164,42 +164,66 @@ const initMain = () => {
             });
         };
 
-        const closeNav = (target) => {
+        const closeNav = () => {
             if (!navOpen) return;
-            // If target is inside nav or burger, don't close
-            if (target && (nav.contains(target) || burger.contains(target))) return;
             navOpen = false;
             nav.classList.remove('nav-active');
             burger.classList.remove('toggle');
             document.body.style.overflow = '';
             navLinks.forEach(li => li.style.animation = '');
-            // Hide completely after transition
             setTimeout(() => {
                 if (!navOpen) nav.style.display = '';
             }, 380);
         };
 
-        const toggleNav = (e) => {
+        // Burger: touchstart handles mobile (preventDefault stops the 300ms click delay)
+        burger.addEventListener('touchstart', (e) => {
+            e.preventDefault();
             e.stopPropagation();
-            if (navOpen) closeNav(null);
+            burgerTouchActive = true;
+            // Use setTimeout 0 so the flag is cleared before doc touchstart fires
+            setTimeout(() => { burgerTouchActive = false; }, 50);
+            if (navOpen) closeNav();
             else openNav();
-        };
+        }, { passive: false });
 
-        // Touch + click on burger (touchstart for zero delay on mobile)
-        burger.addEventListener('touchstart', (e) => { e.preventDefault(); toggleNav(e); }, { passive: false });
-        burger.addEventListener('click', toggleNav);
+        // Burger click: only fires on desktop (touch already handled above)
+        burger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (navOpen) closeNav();
+            else openNav();
+        });
 
-        // Close when tapping/clicking outside nav
-        const handleOutside = (e) => closeNav(e.target);
-        document.addEventListener('touchstart', handleOutside, { passive: true });
-        document.addEventListener('click', handleOutside);
+        // Close when tapping/clicking outside nav or burger
+        document.addEventListener('touchstart', (e) => {
+            if (burgerTouchActive) return; // burger just fired — ignore
+            if (!navOpen) return;
+            if (nav.contains(e.target) || burger.contains(e.target)) return;
+            closeNav();
+        }, { passive: true });
 
-        // Close instantly on nav link tap
+        document.addEventListener('click', (e) => {
+            if (!navOpen) return;
+            if (nav.contains(e.target) || burger.contains(e.target)) return;
+            closeNav();
+        });
+
+        // Nav links: close nav and allow the link to navigate
         navLinks.forEach(li => {
             const a = li.querySelector('a');
             if (!a) return;
-            a.addEventListener('touchstart', () => closeNav(null), { passive: true });
-            a.addEventListener('click', () => closeNav(null));
+            // touchend fires after touchstart; at this point the link navigates
+            a.addEventListener('touchend', (e) => {
+                e.stopPropagation();
+                closeNav();
+                // Short delay so nav closes before navigation fires
+                const href = a.getAttribute('href');
+                if (href && href !== '#') {
+                    e.preventDefault();
+                    setTimeout(() => { window.location.href = href; }, 50);
+                }
+            }, { passive: false });
+            a.addEventListener('click', () => closeNav());
         });
     }
 };
@@ -432,14 +456,19 @@ const initReviewSystem = () => {
     stars.forEach(s => s.classList.add('active'));
 
     stars.forEach((star, index) => {
+        // Desktop: hover preview
         star.addEventListener('mouseenter', () => {
             stars.forEach((s, i) => s.classList.toggle('active', i <= index));
         });
-        star.addEventListener('click', () => {
+        // Click AND touchstart for selecting a rating
+        const selectStar = (e) => {
+            if (e.type === 'touchstart') e.preventDefault();
             selectedRating = parseInt(star.getAttribute('data-rating'));
             ratingInput.value = selectedRating;
             stars.forEach((s, i) => s.classList.toggle('active', i < selectedRating));
-        });
+        };
+        star.addEventListener('click', selectStar);
+        star.addEventListener('touchstart', selectStar, { passive: false });
     });
 
     starRating.addEventListener('mouseleave', () => {

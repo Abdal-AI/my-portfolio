@@ -149,12 +149,15 @@ const initMain = () => {
 
     if (burger) {
         let navOpen = false;
-        let burgerTouchActive = false; // prevents doc touchstart from firing simultaneously
+        let burgerTouchActive = false;
 
         const openNav = () => {
             navOpen = true;
+            // Let CSS display:flex take over via nav-active class
+            // Set inline display first so the class transition can animate
             nav.style.display = 'flex';
             document.body.style.overflow = 'hidden';
+            // rAF ensures display:flex is painted before adding the class
             requestAnimationFrame(() => {
                 nav.classList.add('nav-active');
                 burger.classList.add('toggle');
@@ -171,9 +174,17 @@ const initMain = () => {
             burger.classList.remove('toggle');
             document.body.style.overflow = '';
             navLinks.forEach(li => li.style.animation = '');
+            // Remove inline display after the CSS animation finishes
+            // so the nav truly disappears and stops blocking clicks
             setTimeout(() => {
-                if (!navOpen) nav.style.display = '';
-            }, 380);
+                if (!navOpen) {
+                    nav.style.display = 'none';
+                    // Clear inline style so CSS can take over next open
+                    setTimeout(() => {
+                        if (!navOpen) nav.style.display = '';
+                    }, 50);
+                }
+            }, 350);
         };
 
         // Burger: touchstart handles mobile (preventDefault stops the 300ms click delay)
@@ -181,13 +192,12 @@ const initMain = () => {
             e.preventDefault();
             e.stopPropagation();
             burgerTouchActive = true;
-            // Use setTimeout 0 so the flag is cleared before doc touchstart fires
-            setTimeout(() => { burgerTouchActive = false; }, 50);
+            setTimeout(() => { burgerTouchActive = false; }, 100);
             if (navOpen) closeNav();
             else openNav();
         }, { passive: false });
 
-        // Burger click: only fires on desktop (touch already handled above)
+        // Burger click: fires on desktop (touch already handled above)
         burger.addEventListener('click', (e) => {
             e.stopPropagation();
             if (navOpen) closeNav();
@@ -195,8 +205,9 @@ const initMain = () => {
         });
 
         // Close when tapping/clicking outside nav or burger
+        // IMPORTANT: only active when nav IS open to avoid blocking any normal interaction
         document.addEventListener('touchstart', (e) => {
-            if (burgerTouchActive) return; // burger just fired — ignore
+            if (burgerTouchActive) return;
             if (!navOpen) return;
             if (nav.contains(e.target) || burger.contains(e.target)) return;
             closeNav();
@@ -212,15 +223,13 @@ const initMain = () => {
         navLinks.forEach(li => {
             const a = li.querySelector('a');
             if (!a) return;
-            // touchend fires after touchstart; at this point the link navigates
             a.addEventListener('touchend', (e) => {
                 e.stopPropagation();
-                closeNav();
-                // Short delay so nav closes before navigation fires
                 const href = a.getAttribute('href');
+                closeNav();
                 if (href && href !== '#') {
                     e.preventDefault();
-                    setTimeout(() => { window.location.href = href; }, 50);
+                    setTimeout(() => { window.location.href = href; }, 80);
                 }
             }, { passive: false });
             a.addEventListener('click', () => closeNav());

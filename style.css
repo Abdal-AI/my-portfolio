@@ -337,9 +337,9 @@ nav {
     transform: rotate(45deg) translate(-5px, -6px);
 }
 
-/* Mobile Nav Links — use display:none when closed for 100% reliable touch passthrough */
+/* Mobile Nav Links — display:none when closed (no invisible overlay blocking clicks) */
 .nav-links {
-    display: none;              /* CLOSED: completely removed from touch/hit-testing */
+    display: none;              /* CLOSED: completely removed from hit-testing */
     position: fixed;
     right: 0;
     top: 0;
@@ -353,9 +353,8 @@ nav {
     z-index: 1100;
     padding: 0;
     list-style: none;
-    opacity: 0;
-    transform: translateX(100%);
-    transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.77,0,0.175,1);
+    /* No opacity/transform on the closed state — display:none is enough
+       and avoids the invisible-but-blocking overlay bug */
 }
 
 /* OPEN: visible and interactive */
@@ -364,6 +363,12 @@ nav {
     opacity: 1;
     transform: translateX(0);
     pointer-events: auto;
+    animation: navSlideIn 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes navSlideIn {
+    from { opacity: 0; transform: translateX(100%); }
+    to   { opacity: 1; transform: translateX(0); }
 }
 
 .nav-links li {
@@ -1050,7 +1055,7 @@ footer {
     }
     
     .nav-links {
-        display: flex;
+        display: flex !important;  /* immune to any JS inline style from mobile menu */
         position: static;
         height: auto;
         background: transparent;
@@ -1064,6 +1069,7 @@ footer {
         pointer-events: auto;
         visibility: visible;
         opacity: 1;
+        animation: none !important; /* no slide-in on desktop */
     }
     
     .nav-links li {
